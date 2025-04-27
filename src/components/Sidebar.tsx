@@ -1,7 +1,7 @@
 import { MoreVertical } from "lucide-react";
 import { createContext, useContext, useState, type ReactNode, type FC } from "react";
 import { 
-    HiOutlineHome, HiClipboardList, HiOutlineUserGroup, HiLogout, 
+    HiOutlineHome, HiClipboardList, HiOutlineUserGroup, HiLogout, HiOutlineLogout,
     HiNewspaper, HiPlusCircle, HiDocumentReport, HiPaperAirplane, 
     HiViewGrid, HiUserCircle 
 } from "react-icons/hi";
@@ -19,11 +19,13 @@ const SidebarContext = createContext<SidebarContextType | null>(null);
 // Props para Sidebar
 interface SidebarProps {
     children: ReactNode;
+    onLogout?: () => void;
 }
 
 // Componente Sidebar
-const Sidebar: FC<SidebarProps> = ({ children }) => {
+const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
     const [expanded, setExpanded] = useState(true);
+    const [showMenu, setShowMenu] = useState(false);
 
     return (
         <aside className="h-screen">
@@ -50,7 +52,7 @@ const Sidebar: FC<SidebarProps> = ({ children }) => {
                     <ul className="flex-1 px-3">{children}</ul>
                 </SidebarContext.Provider>
 
-                <div className="border-t flex p-3">
+                <div className="border-t flex p-3 relative">
                     <HiUserCircle className="w-10 h-10 rounded-md" />
                     <div
                         className={`
@@ -62,7 +64,25 @@ const Sidebar: FC<SidebarProps> = ({ children }) => {
                             <h4 className="font-semibold">John Doe</h4>
                             <span className="text-xs text-gray-600">johndoe@gmail.com</span>
                         </div>
-                        <MoreVertical size={20} />
+                        <button
+                            className="ml-2 p-1 rounded hover:bg-gray-200 relative"
+                            onClick={() => setShowMenu((v) => !v)}
+                        >
+                            <HiOutlineLogout size={22} />
+                        </button>
+                        {showMenu && (
+                            <div className="absolute right-0 bottom-full mb-2 bg-white border rounded shadow-lg z-10 min-w-[120px]">
+                                <button
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
+                                    onClick={() => {
+                                        setShowMenu(false);
+                                        if (onLogout) onLogout();
+                                    }}
+                                >
+                                    Cerrar sesión
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </nav>

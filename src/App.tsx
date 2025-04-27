@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Sidebar, { SidebarItem } from "./components/Sidebar";
 import { HiOutlineHome, HiUserGroup, HiUser, HiViewGrid, HiClipboardList, HiDocumentText, HiPlusCircle, HiChartBar, HiOutlineTemplate } from "react-icons/hi";
 import Login from "./components/Login";
-import UsuariosDashboard from "./components/UsuariosDashboard";
+import UsuariosDashboard from "./pages/UsuariosDashboard";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,6 +13,11 @@ function App() {
     // Here you would typically validate credentials with your backend
     // For now, we'll just set isAuthenticated to true
     setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setSelectedScreen('Home');
   };
 
   if (!isAuthenticated) {
@@ -28,7 +33,7 @@ function App() {
 
   return (
     <div className="flex">
-      <Sidebar>
+      <Sidebar onLogout={handleLogout}>
         <SidebarItem icon={<HiOutlineHome size={22} />} text="Home" active={selectedScreen === 'Home'} onClick={() => setSelectedScreen('Home')} />
         <SidebarItem icon={<HiUserGroup size={22} />} text="Usuarios" active={selectedScreen === 'Usuarios'} onClick={() => setSelectedScreen('Usuarios')} />
         <SidebarItem icon={<HiUser size={22} />} text="Profesores" active={selectedScreen === 'Profesores'} onClick={() => setSelectedScreen('Profesores')} />
