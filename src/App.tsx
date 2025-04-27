@@ -1,9 +1,23 @@
 // src/App.tsx
+import { useState } from 'react';
 import Sidebar, { SidebarItem } from "./components/Sidebar";
+import Login from "./components/Login";
 import { 
   LayoutDashboard, Home, StickyNote, Layers, Flag, Calendar, LifeBuoy, Settings } from "lucide-react";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLogin = () => {
+    // Here you would typically validate credentials with your backend
+    // For now, we'll just set isAuthenticated to true
+    setIsAuthenticated(true);
+  };
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
     <div className="flex">
       <Sidebar>
