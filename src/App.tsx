@@ -4,6 +4,7 @@ import Sidebar, { SidebarItem } from "./components/Sidebar";
 import { HiOutlineHome, HiUserGroup, HiUser, HiViewGrid, HiClipboardList, HiDocumentText, HiPlusCircle, HiChartBar, HiOutlineTemplate } from "react-icons/hi";
 import Login from "./components/Login";
 import UsuariosDashboard from "./pages/UsuariosDashboard";
+import NuevaEncuesta from "./pages/NuevaEncuesta";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -27,6 +28,8 @@ function App() {
   let mainContent = null;
   if (selectedScreen === 'Usuarios') {
     mainContent = <UsuariosDashboard />;
+  } else if (selectedScreen === 'Nueva Encuesta') {
+    mainContent = <NuevaEncuesta />;
   } else {
     mainContent = <h1 className="text-2xl font-bold mb-4">Contenido principal aquí</h1>;
   }
