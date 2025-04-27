@@ -5,6 +5,8 @@ import { HiOutlineHome, HiUserGroup, HiUser, HiViewGrid, HiClipboardList, HiDocu
 import Login from "./components/Login";
 import UsuariosDashboard from "./pages/UsuariosDashboard";
 import NuevaEncuesta from "./pages/NuevaEncuesta";
+import Historico from "./pages/Historico";
+import SubirExcel from "./pages/SubirExcel";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -30,6 +32,10 @@ function App() {
     mainContent = <UsuariosDashboard />;
   } else if (selectedScreen === 'Nueva Encuesta') {
     mainContent = <NuevaEncuesta />;
+  } else if (selectedScreen === 'Histórico') {
+    mainContent = <Historico onNavigate={setSelectedScreen} />;
+  } else if (selectedScreen === 'Subir Excel') {
+    mainContent = <SubirExcel />;
   } else {
     mainContent = <h1 className="text-2xl font-bold mb-4">Contenido principal aquí</h1>;
   }
