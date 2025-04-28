@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const NuevaEncuesta: React.FC = () => {
-  const questions = Array.from({ length: 12 }, (_, i) => i + 1);
+  const [questions, setQuestions] = useState(Array.from({ length: 5 }, (_, i) => i + 1));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -9,21 +9,54 @@ const NuevaEncuesta: React.FC = () => {
     alert('Encuesta enviada exitosamente!');
   };
 
+  const addQuestion = () => {
+    if (questions.length < 12) {
+      setQuestions([...questions, questions.length + 1]);
+    }
+  };
+
+  const deleteQuestion = (questionNumber: number) => {
+    if (questions.length > 5) {
+      setQuestions(questions.filter(q => q !== questionNumber));
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Nueva Encuesta</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Nueva Encuesta</h2>
+        {questions.length < 12 && (
+          <button
+            onClick={addQuestion}
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            + Añadir Pregunta
+          </button>
+        )}
+      </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="max-h-[600px] overflow-y-auto pr-4">
           {questions.map((questionNumber) => (
-            <div key={questionNumber} className="mb-6">
+            <div key={questionNumber} className="mb-6 relative">
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 Pregunta {questionNumber}
               </label>
-              <input
-                type="text"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder={`Ingrese la pregunta ${questionNumber}`}
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  placeholder={`Ingrese la pregunta ${questionNumber}`}
+                />
+                {questions.length > 5 && (
+                  <button
+                    type="button"
+                    onClick={() => deleteQuestion(questionNumber)}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

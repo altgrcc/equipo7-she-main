@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 
 const SubirExcel: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [year, setYear] = useState<string>('');
+  const [department, setDepartment] = useState<string>('');
+  const [period, setPeriod] = useState<string>('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -10,17 +13,73 @@ const SubirExcel: React.FC = () => {
   };
 
   const handleUpload = () => {
-    if (file) {
+    if (file && year && department && period) {
       // TODO: Implementar lógica de subida de archivo
-      console.log('Archivo a subir:', file.name);
+      console.log('Datos a subir:', {
+        file: file.name,
+        year,
+        department,
+        period
+      });
       alert('Funcionalidad de subida de archivo en desarrollo');
+    } else {
+      alert('Por favor complete todos los campos');
     }
   };
+
+  const isFormValid = file && year && department && period;
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Subir Excel</h1>
-      <div className="max-w-md space-y-4">
+      <div className="max-w-md space-y-6">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Año
+            </label>
+            <input
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ej: 2024"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Departamento
+            </label>
+            <select
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Seleccione un departamento</option>
+              <option value="Ciencias">Ciencias</option>
+              <option value="Humanidades">Humanidades</option>
+              <option value="Matemáticas">Matemáticas</option>
+              <option value="Idiomas">Idiomas</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Periodo
+            </label>
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Seleccione un periodo</option>
+              <option value="Enero-Junio">Enero-Junio</option>
+              <option value="Julio-Diciembre">Julio-Diciembre</option>
+            </select>
+          </div>
+        </div>
+
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
           <input
             type="file"
@@ -41,11 +100,12 @@ const SubirExcel: React.FC = () => {
             </p>
           )}
         </div>
+
         <button
           onClick={handleUpload}
-          disabled={!file}
+          disabled={!isFormValid}
           className={`w-full py-2 px-4 rounded-lg font-semibold ${
-            file
+            isFormValid
               ? 'bg-green-500 hover:bg-green-600 text-white'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
