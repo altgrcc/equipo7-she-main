@@ -1,5 +1,5 @@
 // src/App.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar, { SidebarItem } from "./components/Sidebar";
 import { HiOutlineHome, HiUserGroup, HiUser, HiViewGrid, HiClipboardList, HiDocumentText, HiPlusCircle, HiChartBar, HiOutlineTemplate } from "react-icons/hi";
 import Login from "./components/Login";
@@ -8,10 +8,16 @@ import ProfesoresDashboard from "./pages/ProfesoresDashboard";
 import NuevaEncuesta from "./pages/NuevaEncuesta";
 import Historico from "./pages/Historico";
 import SubirExcel from "./pages/SubirExcel";
+import DepartamentosDashboard from "./pages/DepartamentosDashboard";
+import ProfesorDetalles from "./pages/ProfesorDetalles";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedScreen, setSelectedScreen] = useState('Home');
+
+  useEffect(() => {
+    console.log('Selected Screen changed:', selectedScreen);
+  }, [selectedScreen]);
 
   const handleLogin = () => {
     // Here you would typically validate credentials with your backend
@@ -24,40 +30,59 @@ function App() {
     setSelectedScreen('Home');
   };
 
+  const handleScreenChange = (screen: string) => {
+    console.log('Changing screen to:', screen);
+    setSelectedScreen(screen);
+  };
+
   if (!isAuthenticated) {
     return <Login onLogin={handleLogin} />;
   }
 
   let mainContent = null;
-  if (selectedScreen === 'Usuarios') {
-    mainContent = <UsuariosDashboard />;
-  } else if (selectedScreen === 'Profesores') {
-    mainContent = <ProfesoresDashboard />;
-  } else if (selectedScreen === 'Nueva Encuesta') {
-    mainContent = <NuevaEncuesta />;
-  } else if (selectedScreen === 'Histórico') {
-    mainContent = <Historico onNavigate={setSelectedScreen} />;
-  } else if (selectedScreen === 'Subir Excel') {
-    mainContent = <SubirExcel />;
-  } else {
-    mainContent = <h1 className="text-2xl font-bold mb-4">Contenido principal aquí</h1>;
+  console.log('Rendering screen:', selectedScreen);
+  
+  switch (selectedScreen) {
+    case 'Usuarios':
+      mainContent = <UsuariosDashboard />;
+      break;
+    case 'Profesores':
+      mainContent = <ProfesoresDashboard />;
+      break;
+    case 'Nueva Encuesta':
+      mainContent = <NuevaEncuesta />;
+      break;
+    case 'Histórico':
+      mainContent = <Historico onNavigate={setSelectedScreen} />;
+      break;
+    case 'Subir Excel':
+      mainContent = <SubirExcel />;
+      break;
+    case 'Departamentos':
+      mainContent = <DepartamentosDashboard />;
+      break;
+    case 'Profesor':
+      mainContent = <ProfesorDetalles />;
+      break;
+    default:
+      mainContent = <h1 className="text-2xl font-bold mb-4">Contenido principal aquí</h1>;
   }
 
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <Sidebar onLogout={handleLogout}>
-        <SidebarItem icon={<HiOutlineHome size={22} />} text="Home" active={selectedScreen === 'Home'} onClick={() => setSelectedScreen('Home')} />
-        <SidebarItem icon={<HiUserGroup size={22} />} text="Usuarios" active={selectedScreen === 'Usuarios'} onClick={() => setSelectedScreen('Usuarios')} />
-        <SidebarItem icon={<HiUser size={22} />} text="Profesores" active={selectedScreen === 'Profesores'} onClick={() => setSelectedScreen('Profesores')} />
-        <SidebarItem icon={<HiViewGrid size={22} />} text="Departamentos" active={selectedScreen === 'Departamentos'} onClick={() => setSelectedScreen('Departamentos')} />
-        <SidebarItem icon={<HiClipboardList size={22} />} text="Evaluaciones" active={selectedScreen === 'Evaluaciones'} onClick={() => setSelectedScreen('Evaluaciones')} />
-        <SidebarItem icon={<HiDocumentText size={22} />} text="Histórico" active={selectedScreen === 'Histórico'} onClick={() => setSelectedScreen('Histórico')} />
-        <SidebarItem icon={<HiPlusCircle size={22} />} text="Nuevo Grupo" active={selectedScreen === 'Nuevo Grupo'} onClick={() => setSelectedScreen('Nuevo Grupo')} />
-        <SidebarItem icon={<HiChartBar size={22} />} text="Resultados" active={selectedScreen === 'Resultados'} onClick={() => setSelectedScreen('Resultados')} />
-        <SidebarItem icon={<HiOutlineTemplate size={22} />} text="Nueva Encuesta" active={selectedScreen === 'Nueva Encuesta'} onClick={() => setSelectedScreen('Nueva Encuesta')} />
+        <SidebarItem icon={<HiOutlineHome size={22} />} text="Home" active={selectedScreen === 'Home'} onClick={() => handleScreenChange('Home')} />
+        <SidebarItem icon={<HiUserGroup size={22} />} text="Usuarios" active={selectedScreen === 'Usuarios'} onClick={() => handleScreenChange('Usuarios')} />
+        <SidebarItem icon={<HiUser size={22} />} text="Profesores" active={selectedScreen === 'Profesores'} onClick={() => handleScreenChange('Profesores')} />
+        <SidebarItem icon={<HiViewGrid size={22} />} text="Departamentos" active={selectedScreen === 'Departamentos'} onClick={() => handleScreenChange('Departamentos')} />
+        <SidebarItem icon={<HiClipboardList size={22} />} text="Evaluaciones" active={selectedScreen === 'Evaluaciones'} onClick={() => handleScreenChange('Evaluaciones')} />
+        <SidebarItem icon={<HiDocumentText size={22} />} text="Histórico" active={selectedScreen === 'Histórico'} onClick={() => handleScreenChange('Histórico')} />
+        <SidebarItem icon={<HiPlusCircle size={22} />} text="Nuevo Grupo" active={selectedScreen === 'Nuevo Grupo'} onClick={() => handleScreenChange('Nuevo Grupo')} />
+        <SidebarItem icon={<HiChartBar size={22} />} text="Resultados" active={selectedScreen === 'Resultados'} onClick={() => handleScreenChange('Resultados')} />
+        <SidebarItem icon={<HiOutlineTemplate size={22} />} text="Nueva Encuesta" active={selectedScreen === 'Nueva Encuesta'} onClick={() => handleScreenChange('Nueva Encuesta')} />
       </Sidebar>
 
-      <main className="flex-1 p-6">
+      <main className="flex-1 overflow-auto bg-gray-50">
         {mainContent}
       </main>
     </div>
