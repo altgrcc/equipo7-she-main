@@ -4,6 +4,7 @@ import Sidebar, { SidebarItem } from "./components/Sidebar";
 import { HiOutlineHome, HiUserGroup, HiUser, HiViewGrid, HiClipboardList, HiDocumentText, HiPlusCircle, HiChartBar, HiOutlineTemplate } from "react-icons/hi";
 import Login from "./components/Login";
 import UsuariosDashboard from "./pages/UsuariosDashboard";
+import ProfesoresDashboard from "./pages/ProfesoresDashboard";
 import NuevaEncuesta from "./pages/NuevaEncuesta";
 import Historico from "./pages/Historico";
 import SubirExcel from "./pages/SubirExcel";
@@ -30,6 +31,8 @@ function App() {
   let mainContent = null;
   if (selectedScreen === 'Usuarios') {
     mainContent = <UsuariosDashboard />;
+  } else if (selectedScreen === 'Profesores') {
+    mainContent = <ProfesoresDashboard />;
   } else if (selectedScreen === 'Nueva Encuesta') {
     mainContent = <NuevaEncuesta />;
   } else if (selectedScreen === 'Histórico') {
