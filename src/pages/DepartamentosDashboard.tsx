@@ -35,12 +35,11 @@ interface QuestionResult {
 }
 
 const departments = [
-  'Ciencias Básicas',
-  'Ingeniería Civil',
-  'Ingeniería Industrial',
-  'Ingeniería Mecánica',
-  'Ingeniería Eléctrica',
-  'Ingeniería en Sistemas',
+  'Académico',
+  'Extraacadémico Deportivo',
+  'Extraacadémico Cultural',
+  'Laboratorista',
+  'Tutoreo'
 ];
 
 const periods = [
@@ -73,7 +72,7 @@ const professors: Professor[] = [
     id: '1',
     name: 'Juan Pérez',
     matricula: '12345',
-    department: 'Ciencias Básicas',
+    department: 'Académico',
     subject: 'Matemáticas',
     evaluationScore: 9.2,
   },
@@ -81,26 +80,74 @@ const professors: Professor[] = [
     id: '2',
     name: 'María García',
     matricula: '67890',
-    department: 'Ingeniería Civil',
-    subject: 'Estructuras',
+    department: 'Académico',
+    subject: 'Física',
     evaluationScore: 8.8,
   },
   {
     id: '3',
     name: 'Carlos López',
     matricula: '54321',
-    department: 'Ingeniería Industrial',
-    subject: 'Procesos',
+    department: 'Extraacadémico Deportivo',
+    subject: 'Fútbol',
     evaluationScore: 8.5,
   },
   {
     id: '4',
     name: 'Ana Martínez',
     matricula: '98765',
-    department: 'Ingeniería Mecánica',
-    subject: 'Termodinámica',
+    department: 'Extraacadémico Deportivo',
+    subject: 'Básquetbol',
     evaluationScore: 9.0,
   },
+  {
+    id: '5',
+    name: 'Pedro Sánchez',
+    matricula: '13579',
+    department: 'Extraacadémico Cultural',
+    subject: 'Música',
+    evaluationScore: 9.5,
+  },
+  {
+    id: '6',
+    name: 'Laura Ramírez',
+    matricula: '24680',
+    department: 'Extraacadémico Cultural',
+    subject: 'Danza',
+    evaluationScore: 8.7,
+  },
+  {
+    id: '7',
+    name: 'Roberto Torres',
+    matricula: '86420',
+    department: 'Laboratorista',
+    subject: 'Química',
+    evaluationScore: 9.1,
+  },
+  {
+    id: '8',
+    name: 'Sofía Mendoza',
+    matricula: '97531',
+    department: 'Laboratorista',
+    subject: 'Biología',
+    evaluationScore: 8.9,
+  },
+  {
+    id: '9',
+    name: 'Miguel Ángel',
+    matricula: '35791',
+    department: 'Tutoreo',
+    subject: 'Orientación Vocacional',
+    evaluationScore: 9.3,
+  },
+  {
+    id: '10',
+    name: 'Elena Ruiz',
+    matricula: '46802',
+    department: 'Tutoreo',
+    subject: 'Desarrollo Personal',
+    evaluationScore: 9.0,
+  }
 ];
 
 const EvaluationDashboard = ({ department, period }: { department: string; period: string }) => {

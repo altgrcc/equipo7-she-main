@@ -1,28 +1,96 @@
 import React from "react";
 
 const initialProfesores = [
-  { 
-    id: 1, 
-    nombre: "Juan", 
-    segundoNombre: "", 
-    apellido: "Pérez", 
-    segundoApellido: "", 
-    matricula: "P001", 
-    correo: "juan@uni.mx", 
-    departamento: "Ciencias", 
-    materias: ["Matemáticas", "Física"]
+  {
+    id: '1',
+    nombre: 'Juan',
+    segundoNombre: 'Carlos',
+    apellido: 'Pérez',
+    segundoApellido: 'González',
+    departamento: 'Académico',
+    materias: ['Matemáticas', 'Cálculo']
   },
-  { 
-    id: 2, 
-    nombre: "Ana", 
-    segundoNombre: "", 
-    apellido: "Gómez", 
-    segundoApellido: "", 
-    matricula: "P002", 
-    correo: "ana@uni.mx", 
-    departamento: "Humanidades", 
-    materias: ["Literatura", "Historia"]
+  {
+    id: '2',
+    nombre: 'María',
+    segundoNombre: 'Isabel',
+    apellido: 'García',
+    segundoApellido: 'López',
+    departamento: 'Académico',
+    materias: ['Física', 'Mecánica']
   },
+  {
+    id: '3',
+    nombre: 'Carlos',
+    segundoNombre: 'Alberto',
+    apellido: 'López',
+    segundoApellido: 'Martínez',
+    departamento: 'Extraacadémico Deportivo',
+    materias: ['Fútbol', 'Entrenamiento Deportivo']
+  },
+  {
+    id: '4',
+    nombre: 'Ana',
+    segundoNombre: 'María',
+    apellido: 'Martínez',
+    segundoApellido: 'Sánchez',
+    departamento: 'Extraacadémico Deportivo',
+    materias: ['Básquetbol', 'Educación Física']
+  },
+  {
+    id: '5',
+    nombre: 'Pedro',
+    segundoNombre: 'José',
+    apellido: 'Sánchez',
+    segundoApellido: 'Ramírez',
+    departamento: 'Extraacadémico Cultural',
+    materias: ['Música', 'Teoría Musical']
+  },
+  {
+    id: '6',
+    nombre: 'Laura',
+    segundoNombre: 'Patricia',
+    apellido: 'Ramírez',
+    segundoApellido: 'Torres',
+    departamento: 'Extraacadémico Cultural',
+    materias: ['Danza', 'Expresión Corporal']
+  },
+  {
+    id: '7',
+    nombre: 'Roberto',
+    segundoNombre: 'Antonio',
+    apellido: 'Torres',
+    segundoApellido: 'Mendoza',
+    departamento: 'Laboratorista',
+    materias: ['Química', 'Laboratorio de Química']
+  },
+  {
+    id: '8',
+    nombre: 'Sofía',
+    segundoNombre: 'Alejandra',
+    apellido: 'Mendoza',
+    segundoApellido: 'Ruiz',
+    departamento: 'Laboratorista',
+    materias: ['Biología', 'Laboratorio de Biología']
+  },
+  {
+    id: '9',
+    nombre: 'Miguel',
+    segundoNombre: 'Ángel',
+    apellido: 'Ruiz',
+    segundoApellido: 'Hernández',
+    departamento: 'Tutoreo',
+    materias: ['Orientación Vocacional', 'Desarrollo Profesional']
+  },
+  {
+    id: '10',
+    nombre: 'Elena',
+    segundoNombre: 'Gabriela',
+    apellido: 'Hernández',
+    segundoApellido: 'Pérez',
+    departamento: 'Tutoreo',
+    materias: ['Desarrollo Personal', 'Habilidades Sociales']
+  }
 ];
 
 const ProfesoresDashboard: React.FC = () => {

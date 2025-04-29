@@ -57,10 +57,11 @@ const SubirExcel: React.FC = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Seleccione un departamento</option>
-              <option value="Ciencias">Ciencias</option>
-              <option value="Humanidades">Humanidades</option>
-              <option value="Matemáticas">Matemáticas</option>
-              <option value="Idiomas">Idiomas</option>
+              <option value="Académico">Académico</option>
+              <option value="Extraacadémico Deportivo">Extraacadémico Deportivo</option>
+              <option value="Extraacadémico Cultural">Extraacadémico Cultural</option>
+              <option value="Laboratorista">Laboratorista</option>
+              <option value="Tutoreo">Tutoreo</option>
             </select>
           </div>
 
