@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { HiUpload, HiDownload } from 'react-icons/hi';
 
 interface ExistingFile {
   filename: string;
@@ -149,116 +150,120 @@ const SubirExcel: React.FC = () => {
   const isFormValid = file && year && department && period;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Subir Excel</h1>
-      <div className="max-w-md space-y-6">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Año
-            </label>
+    <div className="p-6 h-full bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
+      <div className="w-full max-w-md space-y-6 bg-white/30 backdrop-blur-lg border border-white/20 rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+        <h1 className="text-2xl font-bold mb-6 text-gray-800 text-center">Subir Excel</h1>
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Año
+              </label>
+              <input
+                type="number"
+                value={year}
+                onChange={handleYearChange}
+                min="2020"
+                max="3000"
+                step="1"
+                className="w-full px-3 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
+                placeholder="Ej: 2024"
+                onKeyPress={(e) => e.preventDefault()}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Departamento
+              </label>
+              <select
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                className="w-full px-3 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
+              >
+                <option value="">Seleccione un departamento</option>
+                <option value="Académico">Académico</option>
+                <option value="Extraacadémico Deportivo">Extraacadémico Deportivo</option>
+                <option value="Extraacadémico Cultural">Extraacadémico Cultural</option>
+                <option value="Laboratorista">Laboratorista</option>
+                <option value="Tutoreo">Tutoreo</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Periodo
+              </label>
+              <select
+                value={period}
+                onChange={(e) => setPeriod(e.target.value)}
+                className="w-full px-3 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
+              >
+                <option value="">Seleccione un periodo</option>
+                <option value="1">Enero-Junio</option>
+                <option value="2">Julio-Diciembre</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="bg-white/30 backdrop-blur-lg border border-white/20 rounded-2xl p-6 text-center">
             <input
-              type="number"
-              value={year}
-              onChange={handleYearChange}
-              min="2020"
-              max="3000"
-              step="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ej: 2024"
-              onKeyPress={(e) => e.preventDefault()}
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleFileChange}
+              className="hidden"
+              id="file-upload"
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Departamento
-            </label>
-            <select
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <label
+              htmlFor="file-upload"
+              className="cursor-pointer flex items-center justify-center gap-2 text-gray-800 hover:text-green-500 transition-colors duration-200"
             >
-              <option value="">Seleccione un departamento</option>
-              <option value="Académico">Académico</option>
-              <option value="Extraacadémico Deportivo">Extraacadémico Deportivo</option>
-              <option value="Extraacadémico Cultural">Extraacadémico Cultural</option>
-              <option value="Laboratorista">Laboratorista</option>
-              <option value="Tutoreo">Tutoreo</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Periodo
+              <HiUpload className="w-5 h-5" />
+              Seleccionar archivo Excel
             </label>
-            <select
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Seleccione un periodo</option>
-              <option value="1">Enero-Junio</option>
-              <option value="2">Julio-Diciembre</option>
-            </select>
+            {file && (
+              <p className="mt-2 text-sm text-gray-600">
+                Archivo seleccionado: {file.name}
+              </p>
+            )}
           </div>
-        </div>
 
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            onChange={handleFileChange}
-            className="hidden"
-            id="file-upload"
-          />
-          <label
-            htmlFor="file-upload"
-            className="cursor-pointer text-blue-500 hover:text-blue-600"
-          >
-            Seleccionar archivo Excel
-          </label>
-          {file && (
-            <p className="mt-2 text-sm text-gray-600">
-              Archivo seleccionado: {file.name}
-            </p>
+          {showExistingFiles && (
+            <div className="bg-white/30 backdrop-blur-lg border border-white/20 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Archivos existentes para este departamento y periodo:
+              </h3>
+              <ul className="space-y-2">
+                {existingFiles.map((existingFile, index) => (
+                  <li key={index} className="flex items-center justify-between p-3 bg-white/30 backdrop-blur-sm border border-white/20 rounded-lg">
+                    <span className="text-sm text-gray-700">
+                      {existingFile.filename} (Año: {existingFile.year})
+                    </span>
+                    <button
+                      onClick={() => handleDownload(existingFile.filename)}
+                      className="flex items-center gap-1 px-3 py-1 bg-white/30 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-green-500 hover:text-white transition-all duration-200 text-gray-800 text-sm"
+                    >
+                      <HiDownload className="w-4 h-4" />
+                      Descargar
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
+
+          <button
+            onClick={handleUpload}
+            disabled={!isFormValid}
+            className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
+              isFormValid
+                ? 'bg-white/30 backdrop-blur-sm border border-white/30 hover:bg-green-500 hover:text-white text-gray-800'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            Subir Archivo
+          </button>
         </div>
-
-        {showExistingFiles && (
-          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <h3 className="text-lg font-semibold text-yellow-800 mb-2">
-              Archivos existentes para este departamento y periodo:
-            </h3>
-            <ul className="space-y-2">
-              {existingFiles.map((existingFile, index) => (
-                <li key={index} className="flex items-center justify-between p-2 bg-white rounded border">
-                  <span className="text-sm">
-                    {existingFile.filename} (Año: {existingFile.year})
-                  </span>
-                  <button
-                    onClick={() => handleDownload(existingFile.filename)}
-                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-                  >
-                    Descargar
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <button
-          onClick={handleUpload}
-          disabled={!isFormValid}
-          className={`w-full py-2 px-4 rounded-lg font-semibold ${
-            isFormValid
-              ? 'bg-green-500 hover:bg-green-600 text-white'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
-        >
-          Subir Archivo
-        </button>
       </div>
     </div>
   );

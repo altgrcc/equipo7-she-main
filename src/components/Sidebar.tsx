@@ -29,7 +29,7 @@ const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
 
     return (
         <aside className="h-screen">
-            <nav className="h-full flex flex-col bg-white border-r shadow-sm">
+            <nav className="h-full flex flex-col bg-white/30 backdrop-blur-lg border-r border-white/20 shadow-lg">
                 <div className="p-4 pb-2 flex justify-between items-center">
                     {/* SHE Logo */}
                     <div className={`overflow-hidden transition-all ${expanded ? "w-32" : "w-0"}`}>
@@ -52,7 +52,7 @@ const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
                     <ul className="flex-1 px-3">{children}</ul>
                 </SidebarContext.Provider>
 
-                <div className="border-t flex p-3 relative">
+                <div className="border-t border-white/20 flex p-3 relative">
                     <HiUserCircle className="w-10 h-10 rounded-md" />
                     <div
                         className={`
@@ -61,7 +61,7 @@ const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
                         `}
                     >
                         <div className="leading-4">
-                            <h4 className="font-semibold">John Doe</h4>
+                            <h4 className="font-semibold text-gray-800">John Doe</h4>
                             <span className="text-xs text-gray-600">johndoe@gmail.com</span>
                         </div>
                         <button
@@ -71,7 +71,7 @@ const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
                             <HiOutlineLogout size={22} />
                         </button>
                         {showMenu && (
-                            <div className="absolute right-0 bottom-full mb-2 bg-white border rounded shadow-lg z-10 min-w-[120px]">
+                            <div className="absolute right-0 bottom-full mb-2 bg-white/80 backdrop-blur-lg border border-white/30 rounded-lg shadow-lg z-10 min-w-[120px]">
                                 <button
                                     className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
                                     onClick={() => {
@@ -124,7 +124,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
                 font-medium rounded-md cursor-pointer
                 transition-colors group
                 ${active
-                    ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800"
+                    ? "bg-gradient-to-tr from-indigo-200/80 to-indigo-100/80 backdrop-blur-sm text-indigo-800"
                     : "hover:bg-indigo-50 text-gray-600"
                 }
             `}

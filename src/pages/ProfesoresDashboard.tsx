@@ -95,33 +95,39 @@ const initialProfesores = [
 
 const ProfesoresDashboard: React.FC = () => {
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">Profesores</h2>
+    <div className="p-6 h-full bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Profesores</h2>
       </div>
+      
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-lg shadow">
-          <thead>
-            <tr>
-              <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Profesor</th>
-              <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Departamento</th>
-              <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Materias</th>
-            </tr>
-          </thead>
-          <tbody>
-            {initialProfesores.map((profesor) => (
-              <tr key={profesor.id} className="hover:bg-gray-100">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {profesor.nombre} {profesor.segundoNombre} {profesor.apellido} {profesor.segundoApellido}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{profesor.departamento}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {profesor.materias.join(", ")}
-                </td>
+        <div className="bg-white/30 backdrop-blur-lg rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
+          <table className="min-w-full">
+            <thead>
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider bg-white/40 backdrop-blur-sm border-b border-white/30">Profesor</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider bg-white/40 backdrop-blur-sm border-b border-white/30">Departamento</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider bg-white/40 backdrop-blur-sm border-b border-white/30">Materias</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {initialProfesores.map((profesor) => (
+                <tr 
+                  key={profesor.id} 
+                  className="hover:bg-white/20 transition-colors duration-200"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
+                    {profesor.nombre} {profesor.segundoNombre} {profesor.apellido} {profesor.segundoApellido}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{profesor.departamento}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {profesor.materias.join(", ")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -116,12 +116,12 @@ const HistoricoDashboard = () => {
   };
 
   return (
-    <div className="p-6 h-full bg-gray-50">
+    <div className="p-6 h-full bg-gradient-to-br from-blue-50 to-purple-50">
       <div className="mb-6">
         <select
           value={selectedDepartment}
           onChange={(e) => setSelectedDepartment(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
         >
           <option value="">Selecciona un departamento</option>
           {departments.map((dept) => (
@@ -141,26 +141,26 @@ const HistoricoDashboard = () => {
                 {files.map((file) => (
                   <div
                     key={file.id}
-                    className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow duration-200"
+                    className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-all duration-200"
                   >
                     <div className="flex justify-between items-center">
                       <div>
                         <h3 className="font-medium text-gray-900">{file.name}</h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-600">
                           Subido el: {new Date(file.uploadDate).toLocaleDateString('es-ES')}
                         </p>
                       </div>
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleDownload(file)}
-                          className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50 transition-colors duration-200"
+                          className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50/50 transition-colors duration-200"
                           title="Descargar archivo"
                         >
                           <HiDownload className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => handleDelete(file.id)}
-                          className="p-2 text-red-600 hover:text-red-800 rounded-full hover:bg-red-50 transition-colors duration-200"
+                          className="p-2 text-red-600 hover:text-red-800 rounded-full hover:bg-red-50/50 transition-colors duration-200"
                           title="Eliminar archivo"
                         >
                           <HiTrash className="w-5 h-5" />
@@ -172,14 +172,14 @@ const HistoricoDashboard = () => {
               </div>
             ))
           ) : (
-            <div className="bg-white p-6 rounded-lg shadow text-center">
-              <p className="text-gray-500">No hay archivos históricos disponibles para este departamento</p>
+            <div className="bg-white/30 backdrop-blur-lg p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 text-center">
+              <p className="text-gray-600">No hay archivos históricos disponibles para este departamento</p>
             </div>
           )}
         </div>
       ) : (
-        <div className="bg-white p-6 rounded-lg shadow text-center">
-          <p className="text-gray-500">Selecciona un departamento para ver los archivos históricos</p>
+        <div className="bg-white/30 backdrop-blur-lg p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 text-center">
+          <p className="text-gray-600">Selecciona un departamento para ver los archivos históricos</p>
         </div>
       )}
     </div>

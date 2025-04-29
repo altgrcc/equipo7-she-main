@@ -186,14 +186,14 @@ const ResultadosDashboard = () => {
   };
 
   return (
-    <div className="p-6 h-full bg-gray-50">
-      <h1 className="text-2xl font-bold mb-6">Resultados de Evaluaciones</h1>
+    <div className="p-6 h-full bg-gradient-to-br from-blue-50 to-purple-50">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Resultados de Evaluaciones</h1>
 
       <div className="mb-6 flex flex-col md:flex-row gap-4">
         <select
           value={selectedDepartment}
           onChange={(e) => setSelectedDepartment(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
         >
           <option value="">Selecciona un departamento</option>
           {departments.map((dept) => (
@@ -206,7 +206,7 @@ const ResultadosDashboard = () => {
         <select
           value={selectedPeriod}
           onChange={(e) => setSelectedPeriod(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
         >
           {periods.map((period) => (
             <option key={period} value={period}>
@@ -219,75 +219,85 @@ const ResultadosDashboard = () => {
       {selectedDepartment ? (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-2">Promedio del Departamento</h3>
+            <div className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
+              <h3 className="text-lg font-semibold mb-2 text-gray-800">Promedio del Departamento</h3>
               <p className="text-3xl font-bold text-blue-600">{departmentAverage.toFixed(1)}</p>
             </div>
             
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-2">Top Profesores</h3>
+            <div className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
+              <h3 className="text-lg font-semibold mb-2 text-gray-800">Top Profesores</h3>
               <div className="space-y-2">
                 {topProfessors.map((prof, index) => (
                   <div key={prof.id} className="flex justify-between items-center">
-                    <span>{index + 1}. {prof.name}</span>
-                    <span className="font-semibold">{prof.evaluationScore?.toFixed(1)}</span>
+                    <span className="text-gray-700">{index + 1}. {prof.name}</span>
+                    <span className="font-semibold text-gray-800">{prof.evaluationScore?.toFixed(1)}</span>
                   </div>
                 ))}
               </div>
             </div>
             
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-2">Periodo</h3>
-              <p className="text-xl">{selectedPeriod}</p>
+            <div className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
+              <h3 className="text-lg font-semibold mb-2 text-gray-800">Periodo</h3>
+              <p className="text-xl text-gray-700">{selectedPeriod}</p>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg shadow">
+          <div className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Resultados por Pregunta</h3>
+              <h3 className="text-lg font-semibold text-gray-800">Resultados por Pregunta</h3>
               <div className="flex space-x-2">
                 <button
                   onClick={handlePrevQuestion}
-                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                  className="bg-white/50 hover:bg-white/70 backdrop-blur-sm text-gray-700 font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out border border-white/30"
                 >
-                  ←
+                  Anterior
                 </button>
                 <button
                   onClick={handleNextQuestion}
-                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                  className="bg-white/50 hover:bg-white/70 backdrop-blur-sm text-gray-700 font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out border border-white/30"
                 >
-                  →
+                  Siguiente
                 </button>
               </div>
             </div>
-            
-            <div className="mb-4">
-              <p className="text-gray-600">{currentQuestion.question}</p>
-              <p className="text-xl font-semibold mt-2">
-                Promedio: {currentQuestion.averageScore.toFixed(1)}
-              </p>
-            </div>
-            
-            <div className="h-64">
-              <Bar
-                data={chartData}
-                options={{
-                  responsive: true,
+            <div className="bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-white/30">
+              <h4 className="text-gray-800 font-medium mb-4">{currentQuestion.question}</h4>
+              <div className="h-64">
+                <Bar data={chartData} options={{
                   maintainAspectRatio: false,
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      display: false
+                    }
+                  },
                   scales: {
                     y: {
                       beginAtZero: true,
                       max: 10,
+                      grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                      }
                     },
-                  },
-                }}
-              />
+                    x: {
+                      grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                      }
+                    }
+                  }
+                }} />
+              </div>
+              <div className="mt-4 text-center">
+                <p className="text-gray-700">
+                  Promedio: <span className="font-semibold text-gray-800">{currentQuestion.averageScore.toFixed(1)}</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="bg-white p-6 rounded-lg shadow text-center">
-          <p className="text-gray-500">Selecciona un departamento para ver los resultados</p>
+        <div className="bg-white/30 backdrop-blur-lg p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 text-center">
+          <p className="text-gray-700">Selecciona un departamento para ver los resultados</p>
         </div>
       )}
     </div>

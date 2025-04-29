@@ -261,34 +261,34 @@ const DepartamentosDashboard = () => {
 
   if (selectedProfessor) {
     return (
-      <div className="p-6 h-full bg-gray-50">
+      <div className="p-6 h-full bg-gradient-to-br from-blue-50 to-purple-50">
         <button
           onClick={handleBackClick}
-          className="mb-6 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+          className="mb-6 px-4 py-2 bg-white/50 backdrop-blur-sm text-gray-700 font-bold rounded-lg hover:bg-white/70 transition duration-150 ease-in-out border border-white/30"
         >
           ← Volver
         </button>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h1 className="text-2xl font-bold mb-4">{selectedProfessor.name}</h1>
+        <div className="bg-white/30 backdrop-blur-lg p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
+          <h1 className="text-2xl font-bold mb-4 text-gray-800">{selectedProfessor.name}</h1>
           
           <div className="space-y-4">
-            <div>
+            <div className="bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-white/30">
               <h2 className="text-sm font-medium text-gray-500">Matrícula</h2>
-              <p className="text-lg">{selectedProfessor.matricula}</p>
+              <p className="text-lg text-gray-800">{selectedProfessor.matricula}</p>
             </div>
             
-            <div>
+            <div className="bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-white/30">
               <h2 className="text-sm font-medium text-gray-500">Departamento</h2>
-              <p className="text-lg">{selectedProfessor.department}</p>
+              <p className="text-lg text-gray-800">{selectedProfessor.department}</p>
             </div>
             
-            <div>
+            <div className="bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-white/30">
               <h2 className="text-sm font-medium text-gray-500">Materia</h2>
-              <p className="text-lg">{selectedProfessor.subject}</p>
+              <p className="text-lg text-gray-800">{selectedProfessor.subject}</p>
             </div>
             
-            <div>
+            <div className="bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-white/30">
               <h2 className="text-sm font-medium text-gray-500">Resultados de Evaluaciones</h2>
               <div className="mt-2">
                 <EvaluationDashboard 
@@ -304,42 +304,42 @@ const DepartamentosDashboard = () => {
   }
 
   return (
-    <div className="p-6 h-full bg-gray-50">
-      <h1 className="text-2xl font-bold mb-6">Departamentos</h1>
+    <div className="p-6 h-full bg-gradient-to-br from-blue-50 to-purple-50">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Departamentos</h1>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        {departments.map((dept) => (
-          <button
-            key={dept}
-            onClick={() => setSelectedDepartment(dept)}
-            className={`p-4 rounded-lg border transition-colors duration-200 ${
-              selectedDepartment === dept
-                ? 'bg-blue-500 text-white border-blue-500'
-                : 'bg-white hover:bg-gray-100 border-gray-200'
-            }`}
-          >
-            {dept}
-          </button>
-        ))}
+      <div className="mb-6 flex flex-col md:flex-row gap-4">
+        <select
+          value={selectedDepartment}
+          onChange={(e) => setSelectedDepartment(e.target.value)}
+          className="px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
+        >
+          <option value="">Selecciona un departamento</option>
+          {departments.map((dept) => (
+            <option key={dept} value={dept}>
+              {dept}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={selectedPeriod}
+          onChange={(e) => setSelectedPeriod(e.target.value)}
+          className="px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
+        >
+          {periods.map((period) => (
+            <option key={period} value={period}>
+              {period}
+            </option>
+          ))}
+        </select>
       </div>
 
       {selectedDepartment && (
         <div className="mt-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-xl font-semibold text-gray-800">
               Profesores de {selectedDepartment}
             </h2>
-            <select
-              value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="px-4 py-2 border rounded-lg"
-            >
-              {periods.map((period) => (
-                <option key={period} value={period}>
-                  {period}
-                </option>
-              ))}
-            </select>
           </div>
           <div className="space-y-4">
             {filteredProfessors.length > 0 ? (
@@ -347,9 +347,9 @@ const DepartamentosDashboard = () => {
                 <div
                   key={professor.id}
                   onClick={() => handleProfessorClick(professor)}
-                  className="p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200 bg-white"
+                  className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-all duration-200 cursor-pointer"
                 >
-                  <h3 className="font-medium">{professor.name}</h3>
+                  <h3 className="font-medium text-gray-800">{professor.name}</h3>
                   <p className="text-sm text-gray-600">
                     Matrícula: {professor.matricula}
                   </p>
@@ -359,8 +359,8 @@ const DepartamentosDashboard = () => {
                 </div>
               ))
             ) : (
-              <div className="p-4 border rounded-lg bg-white">
-                <p className="text-gray-500">No hay profesores registrados en este departamento</p>
+              <div className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 text-center">
+                <p className="text-gray-600">No hay profesores registrados en este departamento</p>
               </div>
             )}
           </div>

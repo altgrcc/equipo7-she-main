@@ -91,7 +91,6 @@ function App() {
         <SidebarItem icon={<HiViewGrid size={22} />} text="Departamentos" active={selectedScreen === 'Departamentos'} onClick={() => handleScreenChange('Departamentos')} />
         <SidebarItem icon={<HiClipboardList size={22} />} text="Evaluaciones" active={selectedScreen === 'Evaluaciones'} onClick={() => handleScreenChange('Evaluaciones')} />
         <SidebarItem icon={<HiDocumentText size={22} />} text="Histórico" active={selectedScreen === 'Histórico'} onClick={() => handleScreenChange('Histórico')} />
-        <SidebarItem icon={<HiPlusCircle size={22} />} text="Nuevo Grupo" active={selectedScreen === 'Nuevo Grupo'} onClick={() => handleScreenChange('Nuevo Grupo')} />
         <SidebarItem icon={<HiChartBar size={22} />} text="Resultados" active={selectedScreen === 'Resultados'} onClick={() => handleScreenChange('Resultados')} />
         <SidebarItem icon={<HiOutlineTemplate size={22} />} text="Nueva Encuesta" active={selectedScreen === 'Nueva Encuesta'} onClick={() => handleScreenChange('Nueva Encuesta')} />
       </Sidebar>
