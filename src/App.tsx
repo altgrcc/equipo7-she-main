@@ -10,7 +10,10 @@ import Historico from "./pages/Historico";
 import SubirExcel from "./pages/SubirExcel";
 import DepartamentosDashboard from "./pages/DepartamentosDashboard";
 import ProfesorDetalles from "./pages/ProfesorDetalles";
+
 import HomePage from "./pages/homepage";
+import ResultadosDashboard from "./pages/ResultadosDashboard";
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -67,6 +70,9 @@ function App() {
       break;
     case 'Profesor':
       mainContent = <ProfesorDetalles />;
+      break;
+    case 'Resultados':
+      mainContent = <ResultadosDashboard />;
       break;
     default:
       mainContent = <HomePage />;
