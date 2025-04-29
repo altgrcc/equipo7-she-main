@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import ResponseWidget from '../components/ResponseWidget';
+import PendingEvaluationsWidget from '../components/PendingEvaluationsWidget';
 
 const HomePage: FC = () => {
   // This would typically come from your authentication system
@@ -19,6 +20,10 @@ return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <ResponseWidget 
             totalResponses={300}
+            lastUpdated={new Date()}
+            />
+            <PendingEvaluationsWidget
+            pendingCount={15}
             lastUpdated={new Date()}
             />
             {/* Add more widgets here */}
