@@ -12,6 +12,13 @@ const SubirExcel: React.FC = () => {
     }
   };
 
+  const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || (Number(value) >= 1900 && Number(value) <= 3000)) {
+      setYear(value);
+    }
+  };
+
   const handleUpload = () => {
     if (file && year && department && period) {
       // TODO: Implementar lógica de subida de archivo
@@ -41,7 +48,11 @@ const SubirExcel: React.FC = () => {
             <input
               type="number"
               value={year}
-              onChange={(e) => setYear(e.target.value)}
+              onChange={handleYearChange}
+              min="1900"
+              max="2100"
+              step="1"
+              defaultValue="2000"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Ej: 2024"
             />

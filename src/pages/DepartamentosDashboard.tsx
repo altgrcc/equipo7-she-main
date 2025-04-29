@@ -73,7 +73,7 @@ const professors: Professor[] = [
     name: 'Juan Pérez',
     matricula: '12345',
     department: 'Académico',
-    subject: 'Matemáticas',
+    subject: 'Matemáticas II',
     evaluationScore: 9.2,
   },
   {
@@ -105,7 +105,7 @@ const professors: Professor[] = [
     name: 'Pedro Sánchez',
     matricula: '13579',
     department: 'Extraacadémico Cultural',
-    subject: 'Música',
+    subject: 'Piano',
     evaluationScore: 9.5,
   },
   {
@@ -113,7 +113,7 @@ const professors: Professor[] = [
     name: 'Laura Ramírez',
     matricula: '24680',
     department: 'Extraacadémico Cultural',
-    subject: 'Danza',
+    subject: 'Teatro',
     evaluationScore: 8.7,
   },
   {
@@ -137,7 +137,7 @@ const professors: Professor[] = [
     name: 'Miguel Ángel',
     matricula: '35791',
     department: 'Tutoreo',
-    subject: 'Orientación Vocacional',
+    subject: 'Tutoreo III',
     evaluationScore: 9.3,
   },
   {
@@ -145,7 +145,7 @@ const professors: Professor[] = [
     name: 'Elena Ruiz',
     matricula: '46802',
     department: 'Tutoreo',
-    subject: 'Desarrollo Personal',
+    subject: 'Tutoreo I',
     evaluationScore: 9.0,
   }
 ];

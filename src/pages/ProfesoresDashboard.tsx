@@ -8,7 +8,7 @@ const initialProfesores = [
     apellido: 'Pérez',
     segundoApellido: 'González',
     departamento: 'Académico',
-    materias: ['Matemáticas', 'Cálculo']
+    materias: ['Matemáticas I', 'Matemáticas II']
   },
   {
     id: '2',
@@ -17,7 +17,7 @@ const initialProfesores = [
     apellido: 'García',
     segundoApellido: 'López',
     departamento: 'Académico',
-    materias: ['Física', 'Mecánica']
+    materias: ['Física']
   },
   {
     id: '3',
@@ -26,7 +26,7 @@ const initialProfesores = [
     apellido: 'López',
     segundoApellido: 'Martínez',
     departamento: 'Extraacadémico Deportivo',
-    materias: ['Fútbol', 'Entrenamiento Deportivo']
+    materias: ['Fútbol']
   },
   {
     id: '4',
@@ -35,7 +35,7 @@ const initialProfesores = [
     apellido: 'Martínez',
     segundoApellido: 'Sánchez',
     departamento: 'Extraacadémico Deportivo',
-    materias: ['Básquetbol', 'Educación Física']
+    materias: ['Básquetbol']
   },
   {
     id: '5',
@@ -44,7 +44,7 @@ const initialProfesores = [
     apellido: 'Sánchez',
     segundoApellido: 'Ramírez',
     departamento: 'Extraacadémico Cultural',
-    materias: ['Música', 'Teoría Musical']
+    materias: ['Piano']
   },
   {
     id: '6',
@@ -53,7 +53,7 @@ const initialProfesores = [
     apellido: 'Ramírez',
     segundoApellido: 'Torres',
     departamento: 'Extraacadémico Cultural',
-    materias: ['Danza', 'Expresión Corporal']
+    materias: ['Teatro']
   },
   {
     id: '7',
@@ -62,7 +62,7 @@ const initialProfesores = [
     apellido: 'Torres',
     segundoApellido: 'Mendoza',
     departamento: 'Laboratorista',
-    materias: ['Química', 'Laboratorio de Química']
+    materias: ['Química']
   },
   {
     id: '8',
@@ -71,7 +71,7 @@ const initialProfesores = [
     apellido: 'Mendoza',
     segundoApellido: 'Ruiz',
     departamento: 'Laboratorista',
-    materias: ['Biología', 'Laboratorio de Biología']
+    materias: ['Biología']
   },
   {
     id: '9',
@@ -80,7 +80,7 @@ const initialProfesores = [
     apellido: 'Ruiz',
     segundoApellido: 'Hernández',
     departamento: 'Tutoreo',
-    materias: ['Orientación Vocacional', 'Desarrollo Profesional']
+    materias: ['Tutoreo III']
   },
   {
     id: '10',
@@ -89,7 +89,7 @@ const initialProfesores = [
     apellido: 'Hernández',
     segundoApellido: 'Pérez',
     departamento: 'Tutoreo',
-    materias: ['Desarrollo Personal', 'Habilidades Sociales']
+    materias: ['Tutoreo I']
   }
 ];
 
