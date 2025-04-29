@@ -53,7 +53,7 @@ const HomePage: FC = () => {
         >
         <div className="relative z-10 p-6">
             <div className="mb-8">
-            <h1 className="text-4xl font-bold text-[#2836F6] mb-3">
+            <h1 className="text-4xl font-bold text-[#000000] mb-3">
                 ¡Bienvenido, {userName}!
             </h1>
             <p className="text-gray-600 text-lg">
