@@ -1,12 +1,12 @@
 import { FC } from 'react';
 import { HiClipboardList } from 'react-icons/hi';
 
-interface PendingEvaluationsWidgetProps {
-    pendingCount: number;
+interface ExpectedEvaluationsWidgetProps {
+    expectedCount?: number;
     lastUpdated: Date;
 }
 
-const PendingEvaluationsWidget: FC<PendingEvaluationsWidgetProps> = ({ pendingCount, lastUpdated }) => {
+const ExpectedEvaluationsWidget: FC<ExpectedEvaluationsWidgetProps> = ({ expectedCount = 402, lastUpdated }) => {
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat('es-ES', {
             day: '2-digit',
@@ -20,18 +20,18 @@ const PendingEvaluationsWidget: FC<PendingEvaluationsWidgetProps> = ({ pendingCo
     return (
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
             <div className="flex items-center mb-4">
-                <div className="bg-yellow-100 p-3 rounded-full mr-4">
-                    <HiClipboardList className="text-yellow-600 text-2xl" />
+                <div className="bg-[#caf9f8] p-3 rounded-full mr-4 border border-[#caf9f8]">
+                    <HiClipboardList className="text-[#09acac] text-2xl" />
                 </div>
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-800">Evaluaciones Pendientes</h3>
-                    <p className="text-sm text-gray-500">Estudiantes por responder</p>
+                    <h3 className="text-lg font-semibold text-gray-800">Evaluaciones Esperadas</h3>
+                    <p className="text-sm text-gray-500">Total de estudiantes esperados</p>
                 </div>
             </div>
             <div className="flex items-end justify-between">
                 <div>
-                    <p className="text-3xl font-bold text-yellow-600">{pendingCount}</p>
-                    <p className="text-sm text-gray-500">estudiantes no han respondido</p>
+                    <p className="text-3xl font-bold text-[#09acac]">{expectedCount}</p>
+                    <p className="text-sm text-gray-500">estudiantes deben responder</p>
                 </div>
                 <p className="text-xs text-gray-400">
                     Actualizado: {formatDate(lastUpdated)}
@@ -41,4 +41,4 @@ const PendingEvaluationsWidget: FC<PendingEvaluationsWidgetProps> = ({ pendingCo
     );
 };
 
-export default PendingEvaluationsWidget; 
+export default ExpectedEvaluationsWidget; 
