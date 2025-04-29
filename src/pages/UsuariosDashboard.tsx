@@ -26,6 +26,7 @@ const UsuariosDashboard: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<any>(emptyUser);
   const [showMenuId, setShowMenuId] = useState<number | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [roleFilter, setRoleFilter] = useState<string>("todos");
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   // Cerrar menú al hacer clic fuera
@@ -89,6 +90,11 @@ const UsuariosDashboard: React.FC = () => {
     closeModal();
   };
 
+  // Filter users based on selected role
+  const filteredUsuarios = roleFilter === "todos" 
+    ? usuarios 
+    : usuarios.filter(usuario => usuario.rol.toLowerCase() === roleFilter.toLowerCase());
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-4">
@@ -105,12 +111,26 @@ const UsuariosDashboard: React.FC = () => {
           <thead>
             <tr>
               <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Usuario</th>
-              <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Rol</th>
+              <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <div className="flex items-center">
+                  <span>Rol</span>
+                  <select
+                    className="ml-2 border border-gray-300 rounded px-2 py-1 text-sm"
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(e.target.value)}
+                  >
+                    <option value="todos">Todos</option>
+                    <option value="administrador">Administrador</option>
+                    <option value="profesor">Profesor</option>
+                    <option value="estudiante">Estudiante</option>
+                  </select>
+                </div>
+              </th>
               <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-50"></th>
             </tr>
           </thead>
           <tbody>
-            {usuarios.map((usuario) => (
+            {filteredUsuarios.map((usuario) => (
               <tr key={usuario.id} className="hover:bg-gray-100">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {usuario.nombre} {usuario.segundoNombre} {usuario.apellido} {usuario.segundoApellido}
