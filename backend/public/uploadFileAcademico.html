@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subir Encuesta Académica</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 500px;
+    }
+
+    input[type="file"], input[type="text"], input[type="number"] {
+      padding: 10px;
+      margin-top: 10px;
+      width: 80%;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      text-align: left;
+      margin-left: 10%;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Subir Encuesta Académica</h2>
+
+    <form action="/academico/upload" method="POST" enctype="multipart/form-data">
+      <label for="year">Año:</label>
+      <input type="text" name="year" placeholder="Año [20XX]" required>
+      
+      <label for="departamento">Departamento:</label>
+      <input type="text" name="departamento" placeholder="Departamento" required>
+
+      <label for="periodo">Periodo:</label>
+      <input type="number" name="periodo" placeholder="Periodo [1] o [2]" min="1" max="2" required>
+      <label for="excelFile">Seleccionar archivo Excel:</label>
+      <input type="file" name="excelFile" accept=".xlsx" required>
+
+      <button type="submit">Subir Encuesta</button>
+    </form>
+  </div>
+</body>
+</html>

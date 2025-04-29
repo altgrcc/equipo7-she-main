@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actualizar Encuesta de Academico</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 500px;
+    }
+
+    input[type="file"], input[type="text"], input[type="number"] {
+      padding: 10px;
+      margin-top: 10px;
+      width: 80%;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      text-align: left;
+      margin-left: 10%;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Actualizar Encuesta de Academico</h2>
+    <form id="updateForm">
+      <div id="fileList"></div>
+
+      <label for="excelFile">Nuevo archivo Excel:</label>
+      <input type="file" name="excelFile" id="excelFile" accept=".xlsx" required>
+
+      <button type="submit">Actualizar Encuesta</button>
+    </form>
+  </div>
+
+  <script>
+    let selectedFileName = null;
+
+    async function cargarArchivos() {
+      const response = await fetch('/academico/api/listar-archivos');
+      const archivos = await response.json();
+      const container = document.getElementById('fileList');
+      container.innerHTML = '';
+
+      archivos.forEach(file => {
+        const label = document.createElement('label');
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'archivo';
+        radio.value = file;
+        radio.onclick = () => selectedFileName = file;
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(' ' + file));
+        container.appendChild(label);
+      });
+    }
+
+    document.getElementById('updateForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!selectedFileName) {
+        alert('Selecciona un archivo para actualizar.');
+        return;
+      }
+
+      const parts = selectedFileName.replace('.xlsx', '').split('_');
+      if (parts.length < 3) {
+        alert('Formato de archivo inválido.');
+        return;
+      }
+
+      const [year, departamento, periodo] = parts;
+
+      const fileInput = document.getElementById('excelFile');
+      if (!fileInput.files.length) {
+        alert('Selecciona un nuevo archivo Excel.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('year', year);
+      formData.append('departamento', departamento);
+      formData.append('periodo', periodo);
+      formData.append('excelFile', fileInput.files[0]);
+
+      try {
+        const response = await fetch('/academico/upload', {
+          method: 'PUT',
+          body: formData
+        });
+
+        const result = await response.json();
+        alert(result.mensaje || result.error);
+      } catch (error) {
+        console.error('Error al actualizar:', error);
+        alert('Error al actualizar el archivo.');
+      }
+    });
+
+    cargarArchivos();
+  </script>
+</body>
+</html>

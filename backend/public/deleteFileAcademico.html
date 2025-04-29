@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eliminar Encuesta Académica</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 500px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #c82333;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      text-align: left;
+      margin-left: 10%;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Eliminar Encuesta Académica</h2>
+    <form id="deleteForm">
+      <div id="fileList"></div>
+
+      <button type="submit">Eliminar Encuesta Seleccionada</button>
+    </form>
+  </div>
+
+  <script>
+    let selectedFileName = null;
+
+    async function cargarArchivos() {
+      const response = await fetch('/academico/api/listar-archivos');
+      const archivos = await response.json();
+      const container = document.getElementById('fileList');
+      container.innerHTML = '';
+
+      archivos.forEach(file => {
+        const label = document.createElement('label');
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'archivo';
+        radio.value = file;
+        radio.onclick = () => selectedFileName = file;
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(' ' + file));
+        container.appendChild(label);
+      });
+    }
+
+    document.getElementById('deleteForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!selectedFileName) {
+        alert('Selecciona un archivo para eliminar.');
+        return;
+      }
+
+      if (!confirm(`¿Seguro que quieres eliminar "${selectedFileName}"? Esta acción no se puede deshacer.`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/academico/borrar-archivo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileName: selectedFileName })
+        });
+
+        if (response.ok) {
+          alert('Archivo y datos eliminados correctamente.');
+          window.location.reload();
+        } else {
+          const errorData = await response.text();
+          alert('Error al eliminar: ' + errorData);
+        }
+      } catch (error) {
+        console.error('Error al eliminar:', error);
+        alert('Error al eliminar el archivo.');
+      }
+    });
+
+    cargarArchivos();
+  </script>
+</body>
+</html>

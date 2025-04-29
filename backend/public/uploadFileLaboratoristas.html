@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subir Nueva Encuesta de Laboratoristas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 500px;
+    }
+
+    input[type="text"], input[type="number"], input[type="file"] {
+      padding: 10px;
+      margin-top: 10px;
+      width: 80%;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      text-align: left;
+      margin-left: 10%;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Subir Nueva Encuesta de Laboratoristas</h2>
+    <form id="uploadForm">
+      <label for="year">Año:</label>
+      <input type="number" id="year" name="year" required>
+
+      <label for="departamento">Departamento:</label>
+      <input type="text" id="departamento" name="departamento" required>
+
+      <label for="periodo">Periodo:</label>
+      <input type="number" id="periodo" name="periodo" min="1" max="2" required>
+
+      <label for="excelFile">Archivo Excel (.xlsx):</label>
+      <input type="file" name="excelFile" id="excelFile" accept=".xlsx" required>
+
+      <button type="submit">Subir Encuesta</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const year = document.getElementById('year').value.trim();
+      const departamento = document.getElementById('departamento').value.trim();
+      const periodo = document.getElementById('periodo').value.trim();
+      const fileInput = document.getElementById('excelFile');
+
+      if (!year || !departamento || !periodo || !fileInput.files.length) {
+        alert('Por favor, llena todos los campos y selecciona un archivo.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('year', year);
+      formData.append('departamento', departamento);
+      formData.append('periodo', periodo);
+      formData.append('excelFile', fileInput.files[0]);
+
+      try {
+        const response = await fetch('/laboratoristas/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+        alert(result.mensaje || result.error);
+      } catch (error) {
+        console.error('Error al subir:', error);
+        alert('Error al subir el archivo.');
+      }
+    });
+  </script>
+</body>
+</html>
