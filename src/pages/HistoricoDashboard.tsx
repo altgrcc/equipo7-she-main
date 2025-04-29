@@ -1,0 +1,173 @@
+import { useState } from 'react';
+import { HiDownload } from 'react-icons/hi';
+
+interface HistoricalFile {
+  id: string;
+  name: string;
+  department: string;
+  period: string;
+  year: string;
+  uploadDate: string;
+  downloadUrl: string;
+}
+
+// Mock data for historical files
+const mockHistoricalFiles: HistoricalFile[] = [
+  {
+    id: '1',
+    name: 'Evaluaciones_Academico_2024-1.xlsx',
+    department: 'Académico',
+    period: '2024-1',
+    year: '2024',
+    uploadDate: '2024-03-15',
+    downloadUrl: '/download/academico/2024-1'
+  },
+  {
+    id: '2',
+    name: 'Evaluaciones_Deportivo_2024-1.xlsx',
+    department: 'Extraacadémico Deportivo',
+    period: '2024-1',
+    year: '2024',
+    uploadDate: '2024-03-14',
+    downloadUrl: '/download/deportivo/2024-1'
+  },
+  {
+    id: '3',
+    name: 'Evaluaciones_Deportivo_2024-2.xlsx',
+    department: 'Extraacadémico Deportivo',
+    period: '2024-2',
+    year: '2024',
+    uploadDate: '2024-03-20',
+    downloadUrl: '/download/deportivo/2024-2'
+  },
+  {
+    id: '4',
+    name: 'Evaluaciones_Deportivo_2023-2.xlsx',
+    department: 'Extraacadémico Deportivo',
+    period: '2023-2',
+    year: '2023',
+    uploadDate: '2023-12-15',
+    downloadUrl: '/download/deportivo/2023-2'
+  },
+  {
+    id: '5',
+    name: 'Evaluaciones_Cultural_2024-1.xlsx',
+    department: 'Extraacadémico Cultural',
+    period: '2024-1',
+    year: '2024',
+    uploadDate: '2024-03-13',
+    downloadUrl: '/download/cultural/2024-1'
+  },
+  {
+    id: '6',
+    name: 'Evaluaciones_Laboratoristas_2024-1.xlsx',
+    department: 'Laboratorista',
+    period: '2024-1',
+    year: '2024',
+    uploadDate: '2024-03-12',
+    downloadUrl: '/download/laboratoristas/2024-1'
+  },
+  {
+    id: '7',
+    name: 'Evaluaciones_Tutoreo_2024-1.xlsx',
+    department: 'Tutoreo',
+    period: '2024-1',
+    year: '2024',
+    uploadDate: '2024-03-11',
+    downloadUrl: '/download/tutoreo/2024-1'
+  }
+];
+
+const departments = [
+  'Académico',
+  'Extraacadémico Deportivo',
+  'Extraacadémico Cultural',
+  'Laboratorista',
+  'Tutoreo'
+];
+
+const HistoricoDashboard = () => {
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
+
+  const filteredFiles = mockHistoricalFiles.filter(
+    file => file.department === selectedDepartment
+  );
+
+  // Agrupar archivos por período
+  const filesByPeriod = filteredFiles.reduce((acc, file) => {
+    if (!acc[file.period]) {
+      acc[file.period] = [];
+    }
+    acc[file.period].push(file);
+    return acc;
+  }, {} as Record<string, HistoricalFile[]>);
+
+  const handleDownload = (file: HistoricalFile) => {
+    // In a real implementation, this would trigger the file download
+    console.log('Downloading file:', file.name);
+    // window.location.href = file.downloadUrl;
+  };
+
+  return (
+    <div className="p-6 h-full bg-gray-50">
+      <div className="mb-6">
+        <select
+          value={selectedDepartment}
+          onChange={(e) => setSelectedDepartment(e.target.value)}
+          className="px-4 py-2 border rounded-lg"
+        >
+          <option value="">Selecciona un departamento</option>
+          {departments.map((dept) => (
+            <option key={dept} value={dept}>
+              {dept}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {selectedDepartment ? (
+        <div className="space-y-8">
+          {Object.entries(filesByPeriod).length > 0 ? (
+            Object.entries(filesByPeriod).map(([period, files]) => (
+              <div key={period} className="space-y-4">
+                <h2 className="text-xl font-semibold text-gray-800">Período {period}</h2>
+                {files.map((file) => (
+                  <div
+                    key={file.id}
+                    className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow duration-200"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3 className="font-medium text-gray-900">{file.name}</h3>
+                        <p className="text-sm text-gray-500">
+                          Subido el: {new Date(file.uploadDate).toLocaleDateString('es-ES')}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleDownload(file)}
+                        className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50 transition-colors duration-200"
+                        title="Descargar archivo"
+                      >
+                        <HiDownload className="w-6 h-6" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))
+          ) : (
+            <div className="bg-white p-6 rounded-lg shadow text-center">
+              <p className="text-gray-500">No hay archivos históricos disponibles para este departamento</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="bg-white p-6 rounded-lg shadow text-center">
+          <p className="text-gray-500">Selecciona un departamento para ver los archivos históricos</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default HistoricoDashboard; 
