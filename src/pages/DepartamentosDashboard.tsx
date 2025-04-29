@@ -52,17 +52,17 @@ const periods = [
 // Mock data for evaluation results
 const mockQuestionResults: QuestionResult[] = [
   {
-    question: "¿El profesor explica claramente los conceptos?",
+    question: "1. ¿El profesor explica claramente los conceptos?",
     averageScore: 8.5,
     responses: [8, 9, 7, 9, 8, 9, 8, 9, 8, 7],
   },
   {
-    question: "¿El profesor fomenta la participación en clase?",
+    question: "2. ¿El profesor fomenta la participación en clase?",
     averageScore: 7.8,
     responses: [8, 7, 8, 7, 8, 8, 7, 8, 8, 7],
   },
   {
-    question: "¿El profesor está disponible para consultas?",
+    question: "3. ¿El profesor está disponible para consultas?",
     averageScore: 9.2,
     responses: [9, 9, 10, 9, 9, 9, 9, 10, 9, 9],
   },
@@ -123,7 +123,7 @@ const EvaluationDashboard = ({ department, period }: { department: string; perio
   const currentQuestion = mockQuestionResults[currentQuestionIndex];
 
   const chartData = {
-    labels: currentQuestion.responses.map((_, i) => `Respuesta ${i + 1}`),
+    labels: currentQuestion.responses.map((_, i) => `Grupo ${String.fromCharCode(65 + i)}`),
     datasets: [
       {
         label: 'Calificación',
@@ -137,22 +137,10 @@ const EvaluationDashboard = ({ department, period }: { department: string; perio
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-2">Promedio del Departamento</h3>
           <p className="text-3xl font-bold text-blue-600">{departmentAverage.toFixed(1)}</p>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-2">Top Profesores</h3>
-          <div className="space-y-2">
-            {topProfessors.map((prof, index) => (
-              <div key={prof.id} className="flex justify-between items-center">
-                <span>{index + 1}. {prof.name}</span>
-                <span className="font-semibold">{prof.evaluationScore?.toFixed(1)}</span>
-              </div>
-            ))}
-          </div>
         </div>
         
         <div className="bg-white p-4 rounded-lg shadow">
