@@ -10,6 +10,7 @@ import Historico from "./pages/Historico";
 import SubirExcel from "./pages/SubirExcel";
 import DepartamentosDashboard from "./pages/DepartamentosDashboard";
 import ProfesorDetalles from "./pages/ProfesorDetalles";
+import HomePage from "./pages/homepage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,6 +44,9 @@ function App() {
   console.log('Rendering screen:', selectedScreen);
   
   switch (selectedScreen) {
+    case 'Home':
+      mainContent = <HomePage />;
+      break;
     case 'Usuarios':
       mainContent = <UsuariosDashboard />;
       break;
@@ -65,7 +69,7 @@ function App() {
       mainContent = <ProfesorDetalles />;
       break;
     default:
-      mainContent = <h1 className="text-2xl font-bold mb-4">Contenido principal aquí</h1>;
+      mainContent = <HomePage />;
   }
 
   return (
