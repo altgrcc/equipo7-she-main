@@ -35,7 +35,7 @@ const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
             <nav className="h-full flex flex-col bg-white border-r shadow-sm">
                 <div className="p-4 pb-2 flex justify-between items-center">
                     {/* SHE Logo */}
-                    <div className="overflow-hidden transition-all flex items-center" style={{ width: expanded ? 300 : 40 }}>
+                    <div className="overflow-hidden transition-all flex items-center" style={{ width: expanded ? 200 : 40 }}>
                         <img
                             src={onlyStar}
                             alt="SHE Star"
