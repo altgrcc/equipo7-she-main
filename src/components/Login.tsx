@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Lock, Mail } from 'lucide-react';
 import loginBackground from '../assets/login-background.jpg';
+import starLogo from '../assets/star-she.png';
 
 const Login = ({ onLogin }: { onLogin: () => void }) => {
   const [email, setEmail] = useState('');
@@ -32,8 +33,9 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
 
       {/* Login Form Container */}
       <div className="max-w-md w-full space-y-8 p-10 bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl relative z-10">
-        <div>
-          <h2 className="mt-6 text-center text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>
+        <div className="flex flex-col items-center">
+          <img src={starLogo} alt="SHE Logo" className="w-20 h-20 mb-2" />
+          <h2 className="mt-2 text-center text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>
             Bienvenido
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">

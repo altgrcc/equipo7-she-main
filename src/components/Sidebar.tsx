@@ -7,6 +7,9 @@ import {
 } from "react-icons/hi";
 import { HiUser } from "react-icons/hi2";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import sheLogo from '../assets/she-logo.png';
+import onlyStar from '../assets/only-star.png';
+import onlyText from '../assets/only-text.png';
 
 // Definimos la interfaz del contexto
 interface SidebarContextType {
@@ -32,13 +35,21 @@ const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
             <nav className="h-full flex flex-col bg-white border-r shadow-sm">
                 <div className="p-4 pb-2 flex justify-between items-center">
                     {/* SHE Logo */}
-                    <div className={`overflow-hidden transition-all ${expanded ? "w-32" : "w-0"}`}>
-                        <div className="flex items-center">
-                            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 2L21.09 14.91H34L23.45 22.18L26.54 35.09L18 27.82L9.46 35.09L12.55 22.18L2 14.91H14.91L18 2Z" fill="#3B5BDB"/>
-                            </svg>
-                            <span className="ml-2 text-3xl font-bold text-[#3B5BDB]">SHE</span>
-                        </div>
+                    <div className="overflow-hidden transition-all flex items-center" style={{ width: expanded ? 300 : 40 }}>
+                        <img
+                            src={onlyStar}
+                            alt="SHE Star"
+                            className="h-10 w-10"
+                            style={{ objectFit: 'contain', transition: 'all 0.3s' }}
+                        />
+                        {expanded && (
+                            <img
+                                src={onlyText}
+                                alt="SHE Text"
+                                className="h-12 ml-2"
+                                style={{ objectFit: 'contain', transition: 'all 0.3s' }}
+                            />
+                        )}
                     </div>
                     <button
                         onClick={() => setExpanded((curr) => !curr)}
