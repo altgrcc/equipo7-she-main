@@ -10,6 +10,7 @@ import Historico from "./pages/Historico";
 import SubirExcel from "./pages/SubirExcel";
 import DepartamentosDashboard from "./pages/DepartamentosDashboard";
 import ProfesorDetalles from "./pages/ProfesorDetalles";
+import EvaluacionesDashboard from "./pages/EvaluacionesDashboard";
 
 import HomePage from "./pages/homepage";
 import ResultadosDashboard from "./pages/ResultadosDashboard";
@@ -73,6 +74,9 @@ function App() {
       break;
     case 'Resultados':
       mainContent = <ResultadosDashboard />;
+      break;
+    case 'Evaluaciones':
+      mainContent = <EvaluacionesDashboard />;
       break;
     default:
       mainContent = <HomePage />;

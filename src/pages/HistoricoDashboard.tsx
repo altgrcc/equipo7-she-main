@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HiDownload } from 'react-icons/hi';
+import { HiDownload, HiTrash } from 'react-icons/hi';
 
 interface HistoricalFile {
   id: string;
@@ -88,8 +88,9 @@ const departments = [
 
 const HistoricoDashboard = () => {
   const [selectedDepartment, setSelectedDepartment] = useState<string>('');
+  const [files, setFiles] = useState<HistoricalFile[]>(mockHistoricalFiles);
 
-  const filteredFiles = mockHistoricalFiles.filter(
+  const filteredFiles = files.filter(
     file => file.department === selectedDepartment
   );
 
@@ -106,6 +107,12 @@ const HistoricoDashboard = () => {
     // In a real implementation, this would trigger the file download
     console.log('Downloading file:', file.name);
     // window.location.href = file.downloadUrl;
+  };
+
+  const handleDelete = (fileId: string) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este archivo?')) {
+      setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
+    }
   };
 
   return (
@@ -143,13 +150,22 @@ const HistoricoDashboard = () => {
                           Subido el: {new Date(file.uploadDate).toLocaleDateString('es-ES')}
                         </p>
                       </div>
-                      <button
-                        onClick={() => handleDownload(file)}
-                        className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50 transition-colors duration-200"
-                        title="Descargar archivo"
-                      >
-                        <HiDownload className="w-6 h-6" />
-                      </button>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleDownload(file)}
+                          className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50 transition-colors duration-200"
+                          title="Descargar archivo"
+                        >
+                          <HiDownload className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(file.id)}
+                          className="p-2 text-red-600 hover:text-red-800 rounded-full hover:bg-red-50 transition-colors duration-200"
+                          title="Eliminar archivo"
+                        >
+                          <HiTrash className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
