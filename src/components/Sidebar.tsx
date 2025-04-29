@@ -7,6 +7,8 @@ import {
 } from "react-icons/hi";
 import { HiUser } from "react-icons/hi2";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import onlyStar from '../assets/only-star.png';
+import onlyText from '../assets/only-text.png';
 
 // Definimos la interfaz del contexto
 interface SidebarContextType {
@@ -32,13 +34,21 @@ const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
             <nav className="h-full flex flex-col bg-white/30 backdrop-blur-lg border-r border-white/20 shadow-lg">
                 <div className="p-4 pb-2 flex justify-between items-center">
                     {/* SHE Logo */}
-                    <div className={`overflow-hidden transition-all ${expanded ? "w-32" : "w-0"}`}>
-                        <div className="flex items-center">
-                            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 2L21.09 14.91H34L23.45 22.18L26.54 35.09L18 27.82L9.46 35.09L12.55 22.18L2 14.91H14.91L18 2Z" fill="#3B5BDB"/>
-                            </svg>
-                            <span className="ml-2 text-3xl font-bold text-[#3B5BDB]">SHE</span>
-                        </div>
+                    <div className="overflow-hidden transition-all flex items-center" style={{ width: expanded ? 140 : 40 }}>
+                        <img
+                            src={onlyStar}
+                            alt="SHE Star"
+                            className="h-10 w-10"
+                            style={{ objectFit: 'contain', transition: 'all 0.3s' }}
+                        />
+                        {expanded && (
+                            <img
+                                src={onlyText}
+                                alt="SHE Text"
+                                className="h-12 ml-2"
+                                style={{ objectFit: 'contain', transition: 'all 0.3s' }}
+                            />
+                        )}
                     </div>
                     <button
                         onClick={() => setExpanded((curr) => !curr)}
@@ -61,8 +71,8 @@ const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
                         `}
                     >
                         <div className="leading-4">
-                            <h4 className="font-semibold text-gray-800">John Doe</h4>
-                            <span className="text-xs text-gray-600">johndoe@gmail.com</span>
+                            <h4 className="font-semibold text-gray-800">José Luis Mejía</h4>
+                            <span className="text-xs text-gray-600">jl.mejia@tec.mx</span>
                         </div>
                         <button
                             className="ml-2 p-1 rounded hover:bg-gray-200 relative"
