@@ -31,7 +31,7 @@ const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
 
     return (
         <aside className="h-screen">
-            <nav className="h-full flex flex-col bg-white/30 backdrop-blur-lg border-r border-white/20 shadow-lg">
+            <nav className="h-full flex flex-col bg-white/40 backdrop-blur-xl border-r shadow-sm">
                 <div className="p-4 pb-2 flex justify-between items-center">
                     {/* SHE Logo */}
                     <div className="overflow-hidden transition-all flex items-center" style={{ width: expanded ? 140 : 40 }}>
