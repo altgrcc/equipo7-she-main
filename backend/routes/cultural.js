@@ -200,66 +200,73 @@ router.get('/resultados', async (req, res) => {
 
     const rows = result.recordset;
 
-    // 1. Promedios por profesor
     const agrupado = {};
-    rows.forEach((prof) => {
-      const key = `${prof.profesor}__${prof.materia}`;
-      const respuestas = [
-        prof.r1, prof.r2, prof.r3, prof.r4, prof.r5,
-        prof.r6, prof.r7, prof.r8, prof.r9
-      ].map(Number).filter(n => !isNaN(n));
 
+    rows.forEach(row => {
+      const key = `${row.profesor}__${row.materia}`;
       if (!agrupado[key]) {
-        agrupado[key] = { profesor: prof.profesor, materia: prof.materia, total: 0, count: 0 };
+        agrupado[key] = {
+          profesor: row.profesor,
+          materia: row.materia,
+          respuestas: []
+        };
+      }
+      agrupado[key].respuestas.push(row);
+    });
+
+    const profesores = [];
+    let totalPromedios = 0;
+    let conteoPromedios = 0;
+
+    for (const key in agrupado) {
+      const { profesor, materia, respuestas } = agrupado[key];
+      const preguntas = [];
+
+      for (let i = 1; i <= 9; i++) {
+        const keyR = `r${i}`;
+        const valores = respuestas.map(r => Number(r[keyR])).filter(n => !isNaN(n));
+        const promedio = valores.length ? valores.reduce((a, b) => a + b, 0) / valores.length : null;
+
+        preguntas.push({
+          pregunta: `Pregunta ${i}`,
+          promedioGeneral: promedio,
+          promediosPorGrupo: {} // vacíos, para mantener compatibilidad
+        });
       }
 
-      agrupado[key].total += respuestas.reduce((acc, n) => acc + n, 0);
-      agrupado[key].count += respuestas.length;
-    });
+      const todos = respuestas.flatMap(r =>
+        [r.r1, r.r2, r.r3, r.r4, r.r5, r.r6, r.r7, r.r8, r.r9]
+          .map(Number).filter(n => !isNaN(n))
+      );
 
-    const profesoresAgrupados = Object.values(agrupado).map(p => ({
-      profesor: p.profesor,
-      materia: p.materia,
-      promedio: p.count ? p.total / p.count : null
-    }));
+      const promedio = todos.length
+        ? todos.reduce((a, b) => a + b, 0) / todos.length
+        : null;
 
-    const profesoresValidos = profesoresAgrupados.filter(p => p.promedio !== null);
-    const promedioDepto = profesoresValidos.length > 0
-      ? profesoresValidos.reduce((acc, p) => acc + p.promedio, 0) / profesoresValidos.length
-      : 0;
-
-    // 2. Promedios por pregunta
-    const questionTotals = Array(9).fill(0);
-    const questionCounts = Array(9).fill(0);
-
-    rows.forEach((row) => {
-      for (let i = 0; i < 9; i++) {
-        const r = Number(row[`r${i + 1}`]);
-        if (!isNaN(r)) {
-          questionTotals[i] += r;
-          questionCounts[i]++;
-        }
+      if (promedio !== null) {
+        totalPromedios += promedio;
+        conteoPromedios++;
       }
-    });
 
-    const preguntas = questionTotals.map((total, i) => ({
-      pregunta: `Pregunta ${i + 1}`,
-      promedio: questionCounts[i] ? (total / questionCounts[i]) : null,
-      respuestas: rows.map(r => r[`r${i + 1}`]).filter(v => v !== null && v !== undefined)
-    }));
+      profesores.push({
+        profesor,
+        materia,
+        grupos: [], // no hay grupos
+        preguntas,
+        promedio
+      });
+    }
 
-    res.json({
-      promedioDepartamento: promedioDepto.toFixed(1),
-      profesores: profesoresAgrupados,
-      preguntas
-    });
+    const promedioDepartamento = conteoPromedios
+      ? (totalPromedios / conteoPromedios).toFixed(1)
+      : '0.0';
 
+    res.json({ promedioDepartamento, profesores });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Error al obtener resultados' });
+    console.error('Error al obtener resultados culturales:', err);
+    res.status(500).json({ error: 'Error al obtener resultados culturales' });
   }
 });
-
 
 // ----------------------------------------------------------------
 // GET /disponibles - Despliega los archivos existentes

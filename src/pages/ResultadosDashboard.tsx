@@ -8,7 +8,7 @@ import {
   BarElement,
   Title,
   Tooltip,
-  Legend,
+  Legend
 } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -42,6 +42,8 @@ const ResultadosDashboard = () => {
   const [currentProfessorIndex, setCurrentProfessorIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [promedioDepto, setPromedioDepto] = useState<number>(0);
+
+  const isCultural = modulo === 'cultural' || modulo === 'deportivo';
 
   useEffect(() => {
     if (!modulo) return;
@@ -89,6 +91,28 @@ const ResultadosDashboard = () => {
           label === 'Promedio' ? 'rgb(34, 197, 94)' : 'rgb(59, 130, 246)'
         ),
         borderWidth: 1,
+      }
+    ]
+  };
+
+  const barChartCulturalData = {
+    labels: [...(currentProfessor?.preguntas.map(p => p.pregunta) || []), 'Promedio General'],
+    datasets: [
+      {
+        label: 'Promedio por pregunta',
+        data: [
+          ...(currentProfessor?.preguntas.map(p => p.promedioGeneral) || []),
+          promedioDepto
+        ],
+        backgroundColor: [
+          ...Array(currentProfessor?.preguntas.length || 0).fill('rgba(59, 130, 246, 0.5)'),
+          'rgba(34, 197, 94, 0.5)'
+        ],
+        borderColor: [
+          ...Array(currentProfessor?.preguntas.length || 0).fill('rgb(59, 130, 246)'),
+          'rgb(34, 197, 94)'
+        ],
+        borderWidth: 1
       }
     ]
   };
@@ -147,7 +171,7 @@ const ResultadosDashboard = () => {
         </select>
       </div>
 
-      {currentProfessor && currentQuestion ? (
+      {currentProfessor ? (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white/30 p-4 rounded-2xl border border-white/20 text-center">
@@ -172,20 +196,11 @@ const ResultadosDashboard = () => {
           </div>
 
           <div className="bg-white/30 p-4 rounded-2xl border border-white/20">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Resultados por Pregunta</h3>
-              <div className="flex space-x-2">
-                <button onClick={prevQuestion} className="px-4 py-2 bg-gray-100 rounded">Anterior</button>
-                <button onClick={nextQuestion} className="px-4 py-2 bg-gray-100 rounded">Siguiente</button>
-              </div>
-            </div>
-            <div className="bg-white/40 p-4 rounded-xl border border-white/30">
-              <h4 className="text-gray-800 font-medium mb-4">{currentQuestion.pregunta}</h4>
-              <div className="h-64">
+            {isCultural ? (
+              <div className="h-96">
                 <Bar
-                  data={chartData}
+                  data={barChartCulturalData}
                   options={{
-                    maintainAspectRatio: false,
                     responsive: true,
                     plugins: { legend: { display: false } },
                     scales: {
@@ -195,15 +210,41 @@ const ResultadosDashboard = () => {
                   }}
                 />
               </div>
-              <div className="mt-4 text-center text-gray-700 space-y-1">
-                {grupos.map(grupo => (
-                  <p key={grupo}>
-                    Grupo <strong>{grupo}</strong>: <strong>{(currentQuestion.promediosPorGrupo[grupo] ?? 'N/A').toFixed?.(1) || 'N/A'}</strong>
-                  </p>
-                ))}
-
+            ) : currentQuestion ? (
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Resultados por Pregunta</h3>
+                  <div className="flex space-x-2">
+                    <button onClick={prevQuestion} className="px-4 py-2 bg-gray-100 rounded">Anterior</button>
+                    <button onClick={nextQuestion} className="px-4 py-2 bg-gray-100 rounded">Siguiente</button>
+                  </div>
+                </div>
+                <div className="bg-white/40 p-4 rounded-xl border border-white/30">
+                  <h4 className="text-gray-800 font-medium mb-4">{currentQuestion.pregunta}</h4>
+                  <div className="h-64">
+                    <Bar
+                      data={chartData}
+                      options={{
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                          y: { beginAtZero: true, max: 10 },
+                          x: {}
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="mt-4 text-center text-gray-700 space-y-1">
+                    {grupos.map(grupo => (
+                      <p key={grupo}>
+                        Grupo <strong>{grupo}</strong>: <strong>{(currentQuestion.promediosPorGrupo[grupo] ?? 'N/A').toFixed?.(1) || 'N/A'}</strong>
+                      </p>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : null}
           </div>
         </div>
       ) : (
