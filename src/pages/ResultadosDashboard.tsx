@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -10,179 +11,110 @@ import {
   Legend,
 } from 'chart.js';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-interface QuestionResult {
-  question: string;
-  averageScore: number;
-  responses: number[];
+interface Pregunta {
+  pregunta: string;
+  promedioGeneral: number;
+  promediosPorGrupo: { [grupo: string]: number };
 }
 
-interface Professor {
-  id: string;
-  name: string;
-  matricula: string;
-  department: string;
-  subject: string;
-  evaluationScore?: number;
+interface Profesor {
+  profesor: string;
+  materia: string;
+  grupos: string[];
+  preguntas: Pregunta[];
 }
 
-const departments = [
-  'Académico',
-  'Extraacadémico Deportivo',
-  'Extraacadémico Cultural',
-  'Laboratorista',
-  'Tutoreo'
-];
-
-const periods = [
-  '2023-2',
-  '2024-1',
-  '2024-2',
-];
-
-// Mock data for evaluation results
-const mockQuestionResults: QuestionResult[] = [
-  {
-    question: "1. ¿El profesor explica claramente los conceptos?",
-    averageScore: 8.5,
-    responses: [8, 9, 7, 9, 8, 9, 8, 9, 8, 7],
-  },
-  {
-    question: "2. ¿El profesor fomenta la participación en clase?",
-    averageScore: 7.8,
-    responses: [8, 7, 8, 7, 8, 8, 7, 8, 8, 7],
-  },
-  {
-    question: "3. ¿El profesor está disponible para consultas?",
-    averageScore: 9.2,
-    responses: [9, 9, 10, 9, 9, 9, 9, 10, 9, 9],
-  },
-];
-
-const professors: Professor[] = [
-  {
-    id: '1',
-    name: 'Juan Pérez',
-    matricula: '12345',
-    department: 'Académico',
-    subject: 'Matemáticas',
-    evaluationScore: 9.2,
-  },
-  {
-    id: '2',
-    name: 'María García',
-    matricula: '67890',
-    department: 'Académico',
-    subject: 'Física',
-    evaluationScore: 8.8,
-  },
-  {
-    id: '3',
-    name: 'Carlos López',
-    matricula: '54321',
-    department: 'Extraacadémico Deportivo',
-    subject: 'Fútbol',
-    evaluationScore: 8.5,
-  },
-  {
-    id: '4',
-    name: 'Ana Martínez',
-    matricula: '98765',
-    department: 'Extraacadémico Deportivo',
-    subject: 'Básquetbol',
-    evaluationScore: 9.0,
-  },
-  {
-    id: '5',
-    name: 'Pedro Sánchez',
-    matricula: '13579',
-    department: 'Extraacadémico Cultural',
-    subject: 'Música',
-    evaluationScore: 9.5,
-  },
-  {
-    id: '6',
-    name: 'Laura Ramírez',
-    matricula: '24680',
-    department: 'Extraacadémico Cultural',
-    subject: 'Danza',
-    evaluationScore: 8.7,
-  },
-  {
-    id: '7',
-    name: 'Roberto Torres',
-    matricula: '86420',
-    department: 'Laboratorista',
-    subject: 'Química',
-    evaluationScore: 9.1,
-  },
-  {
-    id: '8',
-    name: 'Sofía Mendoza',
-    matricula: '97531',
-    department: 'Laboratorista',
-    subject: 'Biología',
-    evaluationScore: 8.9,
-  },
-  {
-    id: '9',
-    name: 'Miguel Ángel',
-    matricula: '35791',
-    department: 'Tutoreo',
-    subject: 'Orientación Vocacional',
-    evaluationScore: 9.3,
-  },
-  {
-    id: '10',
-    name: 'Elena Ruiz',
-    matricula: '46802',
-    department: 'Tutoreo',
-    subject: 'Desarrollo Personal',
-    evaluationScore: 9.0,
-  }
+const modulos = [
+  { label: 'Académico', value: 'academico' },
+  { label: 'Cultural', value: 'cultural' },
+  { label: 'Deportivo', value: 'deportivo' },
+  { label: 'Laboratoristas', value: 'laboratoristas' },
+  { label: 'Tutoreo', value: 'tutoreo' }
 ];
 
 const ResultadosDashboard = () => {
-  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
-  const [selectedPeriod, setSelectedPeriod] = useState<string>(periods[0]);
+  const [modulo, setModulo] = useState('');
+  const [periodo, setPeriodo] = useState('');
+  const [disponibles, setDisponibles] = useState<{ [year: string]: string[] }>({});
+  const [profesores, setProfesores] = useState<Profesor[]>([]);
+  const [currentProfessorIndex, setCurrentProfessorIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [promedioDepto, setPromedioDepto] = useState<number>(0);
 
-  const departmentProfessors = professors.filter(p => p.department === selectedDepartment);
-  const topProfessors = [...departmentProfessors]
-    .sort((a, b) => (b.evaluationScore || 0) - (a.evaluationScore || 0))
-    .slice(0, 3);
-  
-  const departmentAverage = departmentProfessors.reduce((acc, prof) => acc + (prof.evaluationScore || 0), 0) / departmentProfessors.length || 0;
+  useEffect(() => {
+    if (!modulo) return;
+    axios.get(`/${modulo}/disponibles`).then(res => {
+      setDisponibles(res.data);
+      setPeriodo('');
+      setProfesores([]);
+    });
+  }, [modulo]);
 
-  const handleNextQuestion = () => {
-    setCurrentQuestionIndex((prev) => (prev + 1) % mockQuestionResults.length);
-  };
+  useEffect(() => {
+    if (!modulo || !periodo) return;
+    const [year, periodoTexto] = periodo.split('_');
 
-  const handlePrevQuestion = () => {
-    setCurrentQuestionIndex((prev) => (prev - 1 + mockQuestionResults.length) % mockQuestionResults.length);
-  };
+    axios.get(`/${modulo}/resultados`, {
+      params: { year, periodo: periodoTexto }
+    }).then(res => {
+      setProfesores(res.data.profesores || []);
+      setPromedioDepto(parseFloat(res.data.promedioDepartamento) || 0);
+      setCurrentProfessorIndex(0);
+      setCurrentQuestionIndex(0);
+    });
+  }, [modulo, periodo]);
 
-  const currentQuestion = mockQuestionResults[currentQuestionIndex];
+  const currentProfessor = profesores[currentProfessorIndex] || null;
+  const currentQuestion = currentProfessor?.preguntas[currentQuestionIndex] || null;
+  const grupos = currentProfessor?.grupos || [];
+
+  const chartLabels = [...grupos, 'Promedio'];
+  const chartValues = [
+    ...grupos.map(grupo => currentQuestion?.promediosPorGrupo?.[grupo] ?? 0),
+    currentQuestion?.promedioGeneral ?? 0
+  ];
 
   const chartData = {
-    labels: currentQuestion.responses.map((_, i) => `Grupo ${String.fromCharCode(65 + i)}`),
+    labels: chartLabels,
     datasets: [
       {
-        label: 'Calificación',
-        data: currentQuestion.responses,
-        backgroundColor: 'rgba(59, 130, 246, 0.5)',
-        borderColor: 'rgb(59, 130, 246)',
+        label: 'Promedio por grupo',
+        data: chartValues,
+        backgroundColor: chartLabels.map(label =>
+          label === 'Promedio' ? 'rgba(34, 197, 94, 0.5)' : 'rgba(59, 130, 246, 0.5)'
+        ),
+        borderColor: chartLabels.map(label =>
+          label === 'Promedio' ? 'rgb(34, 197, 94)' : 'rgb(59, 130, 246)'
+        ),
         borderWidth: 1,
-      },
-    ],
+      }
+    ]
+  };
+
+  const nextProfessor = () => {
+    setCurrentProfessorIndex((prev) => (prev + 1) % profesores.length);
+    setCurrentQuestionIndex(0);
+  };
+
+  const prevProfessor = () => {
+    setCurrentProfessorIndex((prev) => (prev - 1 + profesores.length) % profesores.length);
+    setCurrentQuestionIndex(0);
+  };
+
+  const nextQuestion = () => {
+    setCurrentQuestionIndex((prev) =>
+      currentProfessor ? (prev + 1) % currentProfessor.preguntas.length : 0
+    );
+  };
+
+  const prevQuestion = () => {
+    setCurrentQuestionIndex((prev) =>
+      currentProfessor
+        ? (prev - 1 + currentProfessor.preguntas.length) % currentProfessor.preguntas.length
+        : 0
+    );
   };
 
   return (
@@ -191,117 +123,96 @@ const ResultadosDashboard = () => {
 
       <div className="mb-6 flex flex-col md:flex-row gap-4">
         <select
-          value={selectedDepartment}
-          onChange={(e) => setSelectedDepartment(e.target.value)}
-          className="px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
+          value={modulo}
+          onChange={(e) => setModulo(e.target.value)}
+          className="px-4 py-2 bg-white/50 border border-white/30 rounded-lg"
         >
-          <option value="">Selecciona un departamento</option>
-          {departments.map((dept) => (
-            <option key={dept} value={dept}>
-              {dept}
-            </option>
+          <option value="">Selecciona un módulo</option>
+          {modulos.map(m => (
+            <option key={m.value} value={m.value}>{m.label}</option>
           ))}
         </select>
 
         <select
-          value={selectedPeriod}
-          onChange={(e) => setSelectedPeriod(e.target.value)}
-          className="px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
+          value={periodo}
+          onChange={(e) => setPeriodo(e.target.value)}
+          className="px-4 py-2 bg-white/50 border border-white/30 rounded-lg"
         >
-          {periods.map((period) => (
-            <option key={period} value={period}>
-              {period}
-            </option>
-          ))}
+          <option value="">Selecciona un periodo</option>
+          {Object.entries(disponibles).map(([year, periodos]) =>
+            periodos.map(p => (
+              <option key={`${year}_${p}`} value={`${year}_${p}`}>{`${year}_${p}`}</option>
+            ))
+          )}
         </select>
       </div>
 
-      {selectedDepartment ? (
+      {currentProfessor && currentQuestion ? (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
-              <h3 className="text-lg font-semibold mb-2 text-gray-800">Promedio del Departamento</h3>
-              <p className="text-3xl font-bold text-blue-600">{departmentAverage.toFixed(1)}</p>
+            <div className="bg-white/30 p-4 rounded-2xl border border-white/20 text-center">
+              <h3 className="text-lg font-semibold text-gray-800">Promedio del Departamento</h3>
+              <p className="text-3xl font-bold text-blue-600">{promedioDepto.toFixed(1)}</p>
             </div>
-            
-            <div className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
-              <h3 className="text-lg font-semibold mb-2 text-gray-800">Top Profesores</h3>
-              <div className="space-y-2">
-                {topProfessors.map((prof, index) => (
-                  <div key={prof.id} className="flex justify-between items-center">
-                    <span className="text-gray-700">{index + 1}. {prof.name}</span>
-                    <span className="font-semibold text-gray-800">{prof.evaluationScore?.toFixed(1)}</span>
-                  </div>
-                ))}
+
+            <div className="bg-white/30 p-4 rounded-2xl border border-white/20 text-center">
+              <h3 className="text-lg font-semibold text-gray-800">Profesor Seleccionado</h3>
+              <p className="text-xl font-medium">{currentProfessor.profesor}</p>
+              <p className="text-sm text-gray-600">{currentProfessor.materia}</p>
+              <div className="mt-2 flex justify-center gap-2">
+                <button onClick={prevProfessor} className="px-3 py-1 bg-gray-100 rounded">←</button>
+                <button onClick={nextProfessor} className="px-3 py-1 bg-gray-100 rounded">→</button>
               </div>
             </div>
-            
-            <div className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
-              <h3 className="text-lg font-semibold mb-2 text-gray-800">Periodo</h3>
-              <p className="text-xl text-gray-700">{selectedPeriod}</p>
+
+            <div className="bg-white/30 p-4 rounded-2xl border border-white/20 text-center">
+              <h3 className="text-lg font-semibold text-gray-800">Periodo</h3>
+              <p className="text-xl text-gray-700">{periodo}</p>
             </div>
           </div>
 
-          <div className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
+          <div className="bg-white/30 p-4 rounded-2xl border border-white/20">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800">Resultados por Pregunta</h3>
               <div className="flex space-x-2">
-                <button
-                  onClick={handlePrevQuestion}
-                  className="bg-white/50 hover:bg-white/70 backdrop-blur-sm text-gray-700 font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out border border-white/30"
-                >
-                  Anterior
-                </button>
-                <button
-                  onClick={handleNextQuestion}
-                  className="bg-white/50 hover:bg-white/70 backdrop-blur-sm text-gray-700 font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out border border-white/30"
-                >
-                  Siguiente
-                </button>
+                <button onClick={prevQuestion} className="px-4 py-2 bg-gray-100 rounded">Anterior</button>
+                <button onClick={nextQuestion} className="px-4 py-2 bg-gray-100 rounded">Siguiente</button>
               </div>
             </div>
-            <div className="bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-white/30">
-              <h4 className="text-gray-800 font-medium mb-4">{currentQuestion.question}</h4>
+            <div className="bg-white/40 p-4 rounded-xl border border-white/30">
+              <h4 className="text-gray-800 font-medium mb-4">{currentQuestion.pregunta}</h4>
               <div className="h-64">
-                <Bar data={chartData} options={{
-                  maintainAspectRatio: false,
-                  responsive: true,
-                  plugins: {
-                    legend: {
-                      display: false
+                <Bar
+                  data={chartData}
+                  options={{
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                      y: { beginAtZero: true, max: 10 },
+                      x: {}
                     }
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      max: 10,
-                      grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                      }
-                    },
-                    x: {
-                      grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                      }
-                    }
-                  }
-                }} />
+                  }}
+                />
               </div>
-              <div className="mt-4 text-center">
-                <p className="text-gray-700">
-                  Promedio: <span className="font-semibold text-gray-800">{currentQuestion.averageScore.toFixed(1)}</span>
-                </p>
+              <div className="mt-4 text-center text-gray-700 space-y-1">
+                {grupos.map(grupo => (
+                  <p key={grupo}>
+                    Grupo <strong>{grupo}</strong>: <strong>{(currentQuestion.promediosPorGrupo[grupo] ?? 'N/A').toFixed?.(1) || 'N/A'}</strong>
+                  </p>
+                ))}
+
               </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="bg-white/30 backdrop-blur-lg p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 text-center">
-          <p className="text-gray-700">Selecciona un departamento para ver los resultados</p>
+        <div className="bg-white/30 p-8 rounded-2xl border border-white/20 text-center">
+          <p className="text-gray-700">Selecciona un módulo y un periodo para ver los resultados</p>
         </div>
       )}
     </div>
   );
 };
 
-export default ResultadosDashboard; 
+export default ResultadosDashboard;

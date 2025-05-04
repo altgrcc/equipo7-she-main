@@ -28,14 +28,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-
-// ------------------------------------------------------
-// GET /upload - Mostrar formulario para subir archivo académico
-// ------------------------------------------------------
-router.get('/upload', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/uploadFileAcademico.html'));
-});
-
 // ------------------------------------------------------
 // POST /upload - Subir nuevo archivo académico y guardar datos
 // ------------------------------------------------------
@@ -164,144 +156,6 @@ router.post('/upload', upload.single('excelFile'), async (req, res) => {
 });
 
 // ------------------------------------------------------
-// GET /update - Mostrar formulario para actualizar archivo académico
-// ------------------------------------------------------
-//router.get('/update', (req, res) => {
-  //res.sendFile(path.join(__dirname, '../public/updateFileAcademico.html'));
-//});
-
-// ------------------------------------------------------
-// PUT /upload - Actualizar archivo académico existente
-// ------------------------------------------------------
-router.put('/upload', upload.single('excelFile'), async (req, res) => {
-  const { year, departamento, periodo } = req.body;
-  const originalPath = req.file.path;
-  const fileExtension = path.extname(req.file.originalname);
-  const departamentoFinal = ['academico', 'Académico'].includes(departamento) ? 'Academico' : departamento;
-  const baseName = `${year}_${departamentoFinal}_${periodo}`;
-  const finalPath = path.join(uploadsDir, `${baseName}${fileExtension}`);
-
-  try {
-    if (!fs.existsSync(finalPath)) {
-      fs.unlinkSync(originalPath);
-      return res.status(404).json({ error: 'No existe un archivo previo para actualizar.' });
-    }
-
-    fs.unlinkSync(finalPath);
-    fs.renameSync(originalPath, finalPath);
-
-    const rows = await readXlsxFile(finalPath);
-    const preguntas = rows[0].slice(4);
-    const data = rows.slice(3);
-    const pool = await sql.connect(connection);
-
-    // Eliminar registros previos
-    await pool.request()
-      .input('year', sql.Char, year.trim())
-      .input('periodo', sql.Int, parseInt(periodo))
-      .query('DELETE FROM academico WHERE year = @year AND periodo = @periodo');
-
-    // Insertar nuevos registros
-    const jsonObjects = data.map((row) => {
-      const obj = {
-        grupo: row[0]?.toString().trim() || '',
-        comentario: row[1] || 'NA',
-        profesor: row[2] || '',
-        clase: row[3] || '',
-        year: year.trim(),
-        periodo: parseInt(periodo)
-      };
-      for (let i = 0; i < 13; i++) {
-        obj[`r${i+1}`] = row[i+4] ?? 'NA';
-      }
-      return obj;
-    });
-
-    for (const item of jsonObjects) {
-      await pool.request()
-        .input('grupo', sql.Char, item.grupo)
-        .input('comentario', sql.VarChar, item.comentario)
-        .input('profesor', sql.VarChar, item.profesor)
-        .input('clase', sql.VarChar, item.clase)
-        .input('year', sql.Char, item.year)
-        .input('periodo', sql.Int, item.periodo)
-        .input('p1', sql.VarChar, preguntas[0])
-        .input('p2', sql.VarChar, preguntas[1])
-        .input('p3', sql.VarChar, preguntas[2])
-        .input('p4', sql.VarChar, preguntas[3])
-        .input('p5', sql.VarChar, preguntas[4])
-        .input('p6', sql.VarChar, preguntas[5])
-        .input('p7', sql.VarChar, preguntas[6])
-        .input('p8', sql.VarChar, preguntas[7])
-        .input('p9', sql.VarChar, preguntas[8])
-        .input('p10', sql.VarChar, preguntas[9])
-        .input('p11', sql.VarChar, preguntas[10])
-        .input('p12', sql.VarChar, preguntas[11])
-        .input('p13', sql.VarChar, preguntas[12])
-        .input('r1', sql.Int, (item.r1))
-        .input('r2', sql.Int, (item.r2))
-        .input('r3', sql.Int, (item.r3))
-        .input('r4', sql.Int, (item.r4))
-        .input('r5', sql.Int, (item.r5))
-        .input('r6', sql.Int, (item.r6))
-        .input('r7', sql.Int, (item.r7))
-        .input('r8', sql.Int, (item.r8))
-        .input('r9', sql.Int, (item.r9))
-        .input('r10', sql.Int, (item.r10))
-        .input('r11', sql.Int, (item.r11))
-        .input('r12', sql.Int, (item.r12))
-        .input('r13', sql.Int, (item.r13))
-        .query(`INSERT INTO academico (grupo, comentario, profesor, clase, year, periodo,
-            p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13,
-            r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13)
-          VALUES (@grupo, @comentario, @profesor, @clase, @year, @periodo,
-            @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13,
-            @r1, @r2, @r3, @r4, @r5, @r6, @r7, @r8, @r9, @r10, @r11, @r12, @r13)`);
-    }
-
-    res.status(200).json({ mensaje: 'Archivo académico actualizado y datos reinsertados correctamente.' });
-
-  } catch (err) {
-    console.error('Error en la actualización:', err);
-    if (originalPath && fs.existsSync(originalPath)) {
-      fs.unlinkSync(originalPath);
-    }
-    res.status(500).json({ error: 'Error al actualizar el archivo.' });
-  }
-});
-
-// ------------------------------------------------------
-// GET / - Consultar encuestas académicas por periodo y año
-// ------------------------------------------------------
-router.get('/', async (req, res) => {
-  const { periodo, year } = req.query;
-
-  if (!periodo || !year) {
-    return res.status(400).json({ error: 'Debes proporcionar un periodo y un año.' });
-  }
-
-  try {
-    const pool = await sql.connect(connection);
-    const result = await pool.request()
-      .input('periodo', sql.Int, periodo)
-      .input('year', sql.Char, year)
-      .query('SELECT * FROM academico WHERE periodo = @periodo AND year = @year');
-
-    res.status(200).json(result.recordset);
-  } catch (error) {
-    console.error('Error al obtener las encuestas académicas:', error);
-    res.status(500).json({ error: 'Error al obtener encuestas académicas.' });
-  }
-});
-
-// ------------------------------------------------------
-// GET /delete - Mostrar formulario para eliminar archivo académico
-// ------------------------------------------------------
-router.get('/delete', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/deleteFileAcademico.html'));
-});
-
-// ------------------------------------------------------
 // GET /api/listar-archivos - Listar archivos académicos
 // ------------------------------------------------------
 router.get('/api/listar-archivos', (req, res) => {
@@ -351,7 +205,9 @@ router.post('/borrar-archivo', async (req, res) => {
   }
 });
 
-//historico
+// ----------------------------------------------------------------
+// GET /historico - Muestra los archivos subidos por año y periodo
+// ----------------------------------------------------------------
 router.get('/historico', async (req, res) => {
   try {
     const pool = await sql.connect(connection);
@@ -373,6 +229,9 @@ router.get('/historico', async (req, res) => {
   }
 });
 
+// ----------------------------------------------------------------
+// GET /resultados - Obtiene promedios por profesor y por pregunta
+// ----------------------------------------------------------------
 router.get('/resultados', async (req, res) => {
   const { year, periodo } = req.query;
 
@@ -386,7 +245,7 @@ router.get('/resultados', async (req, res) => {
       .input('year', year)
       .input('periodo', periodo)
       .query(`
-        SELECT profesor, clase AS materia,
+        SELECT grupo, profesor, clase AS materia,
                r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13
         FROM academico
         WHERE year = @year AND periodo = @periodo
@@ -394,45 +253,87 @@ router.get('/resultados', async (req, res) => {
 
     const rows = result.recordset;
 
-    const agrupado = {};
+    const profesoresMap = {};
 
-    rows.forEach((prof) => {
-      const key = `${prof.profesor}__${prof.materia}`;
-      const respuestas = [
-        prof.r1, prof.r2, prof.r3, prof.r4, prof.r5, prof.r6, prof.r7,
-        prof.r8, prof.r9, prof.r10, prof.r11, prof.r12, prof.r13
-      ].map(Number).filter(n => !isNaN(n));
+    for (const row of rows) {
+      const key = `${row.profesor}__${row.materia}`;
 
-      if (!agrupado[key]) {
-        agrupado[key] = { profesor: prof.profesor, materia: prof.materia, total: 0, count: 0 };
+      if (!profesoresMap[key]) {
+        profesoresMap[key] = {
+          profesor: row.profesor,
+          materia: row.materia,
+          grupos: new Set(),
+          preguntas: Array.from({ length: 13 }, (_, i) => ({
+            pregunta: `Pregunta ${i + 1}`,
+            promediosPorGrupo: {},
+            total: 0,
+            count: 0
+          }))
+        };
       }
 
-      agrupado[key].total += respuestas.reduce((acc, n) => acc + n, 0);
-      agrupado[key].count += respuestas.length;
-    });
+      const grupo = row.grupo;
+      profesoresMap[key].grupos.add(grupo);
 
-    const profesoresAgrupados = Object.values(agrupado).map(p => ({
+      for (let i = 1; i <= 13; i++) {
+        const value = Number(row[`r${i}`]);
+        if (!isNaN(value)) {
+          const pregunta = profesoresMap[key].preguntas[i - 1];
+
+          if (!pregunta.promediosPorGrupo[grupo]) {
+            pregunta.promediosPorGrupo[grupo] = { total: 0, count: 0 };
+          }
+
+          pregunta.promediosPorGrupo[grupo].total += value;
+          pregunta.promediosPorGrupo[grupo].count += 1;
+
+          pregunta.total += value;
+          pregunta.count += 1;
+        }
+      }
+    }
+
+    // Convertir promedios
+    const profesores = Object.values(profesoresMap).map(p => ({
       profesor: p.profesor,
       materia: p.materia,
-      promedio: p.count ? p.total / p.count : null
+      grupos: Array.from(p.grupos),
+      preguntas: p.preguntas.map(preg => {
+        const promediosPorGrupo = {};
+        for (const [grupo, stats] of Object.entries(preg.promediosPorGrupo)) {
+          promediosPorGrupo[grupo] = stats.count ? stats.total / stats.count : null;
+        }
+
+        return {
+          pregunta: preg.pregunta,
+          promediosPorGrupo,
+          promedioGeneral: preg.count ? preg.total / preg.count : null
+        };
+      })
     }));
 
-    const profesoresValidos = profesoresAgrupados.filter(p => p.promedio !== null);
-
-    const promedioDepto = profesoresValidos.length > 0
-      ? profesoresValidos.reduce((acc, p) => acc + p.promedio, 0) / profesoresValidos.length
+    // Promedio del departamento (promedio de promedios por profesor)
+    const promedioDepto = profesores.length > 0
+      ? profesores.reduce((acc, p) => {
+          const sum = p.preguntas.reduce((s, preg) => s + (preg.promedioGeneral || 0), 0);
+          return acc + (sum / p.preguntas.length);
+        }, 0) / profesores.length
       : 0;
 
     res.json({
       promedioDepartamento: promedioDepto.toFixed(1),
-      profesores: profesoresAgrupados
+      profesores
     });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Error al obtener resultados' });
+    console.error('Error en /academico/resultados:', err);
+    res.status(500).json({ error: 'Error al obtener resultados académicos por profesor' });
   }
 });
 
+// ----------------------------------------------------------------
+// GET /disponibles - Despliega los archivos existentes
+// ----------------------------------------------------------------
 router.get('/disponibles', async (req, res) => {
   try {
     const pool = await sql.connect(connection);

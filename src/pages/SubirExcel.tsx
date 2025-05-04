@@ -36,13 +36,13 @@ const SubirExcel: React.FC<SubirExcelProps> = ({ onNavigate }) => {
 
       let endpoint = '';
       switch (department) {
-        case 'Académico':
+        case 'Academico':
           endpoint = '/academico/upload';
           break;
-        case 'Extraacadémico Deportivo':
+        case 'Deportivo':
           endpoint = '/deportivo/upload';
           break;
-        case 'Extraacadémico Cultural':
+        case 'Cultural':
           endpoint = '/cultural/upload';
           break;
         case 'Laboratoristas':
@@ -178,9 +178,9 @@ const SubirExcel: React.FC<SubirExcelProps> = ({ onNavigate }) => {
                 className="w-full px-3 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
               >
                 <option value="">Seleccione un departamento</option>
-                <option value="Académico">Académico</option>
-                <option value="Extraacadémico Deportivo">Extraacadémico Deportivo</option>
-                <option value="Extraacadémico Cultural">Extraacadémico Cultural</option>
+                <option value="Academico">Académico</option>
+                <option value="Deportivo">Extraacadémico Deportivo</option>
+                <option value="Cultural">Extraacadémico Cultural</option>
                 <option value="Laboratoristas">Laboratoristas</option>
                 <option value="Tutoreo">Tutoreo</option>
               </select>
