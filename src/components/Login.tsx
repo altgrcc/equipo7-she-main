@@ -5,12 +5,35 @@ import loginBackground from '../assets/login-background.jpg';
 const Login = ({ onLogin }: { onLogin: () => void }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically validate and send the credentials to your backend
-    // For now, we'll just call onLogin
-    onLogin();
+    setError('');
+
+    try {
+      const response = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matricula: email, password }), // usando "email" como matrícula
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Credenciales incorrectas');
+        return;
+      }
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+
+      onLogin(); // redirige o cambia estado global
+
+    } catch (err) {
+      console.error('Error en login:', err);
+      setError('Error de conexión con el servidor');
+    }
   };
 
   return (
@@ -21,7 +44,6 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
         position: 'relative',
       }}
     >
-      {/* Overlay with a softer blue color */}
       <div 
         className="absolute inset-0"
         style={{
@@ -30,7 +52,6 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
         }}
       />
 
-      {/* Login Form Container */}
       <div className="max-w-md w-full space-y-8 p-10 bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl relative z-10">
         <div>
           <h2 className="mt-6 text-center text-4xl font-bold text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -40,6 +61,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
             Ingresa tus credenciales para acceder al dashboard
           </p>
         </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md space-y-4">
             <div className="relative">
@@ -47,14 +69,15 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
                 <Mail className="h-5 w-5 text-gray-400" />
               </div>
               <input
-                type="email"
+                type="text"
                 required
                 className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 text-gray-900 placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all"
-                placeholder="Correo electrónico"
+                placeholder="Matrícula"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Lock className="h-5 w-5 text-gray-400" />
@@ -70,6 +93,10 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
             </div>
           </div>
 
+          {error && (
+            <div className="text-sm text-red-600 text-center">{error}</div>
+          )}
+
           <div>
             <button
               type="submit"
@@ -84,4 +111,4 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
   );
 };
 
-export default Login; 
+export default Login;

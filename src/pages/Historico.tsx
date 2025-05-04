@@ -1,89 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HiDownload, HiTrash, HiUpload } from 'react-icons/hi';
 
 interface HistoricalFile {
-  id: string;
   name: string;
   department: string;
   period: string;
   year: string;
-  uploadDate: string;
   downloadUrl: string;
 }
 
-// Mock data for historical files
-const mockHistoricalFiles: HistoricalFile[] = [
-  {
-    id: '1',
-    name: 'Evaluaciones_Academico_2024-1.xlsx',
-    department: 'Académico',
-    period: '2024-1',
-    year: '2024',
-    uploadDate: '2024-03-15',
-    downloadUrl: '/download/academico/2024-1'
-  },
-  {
-    id: '2',
-    name: 'Evaluaciones_Deportivo_2024-1.xlsx',
-    department: 'Extraacadémico Deportivo',
-    period: '2024-1',
-    year: '2024',
-    uploadDate: '2024-03-14',
-    downloadUrl: '/download/deportivo/2024-1'
-  },
-  {
-    id: '3',
-    name: 'Evaluaciones_Deportivo_2024-2.xlsx',
-    department: 'Extraacadémico Deportivo',
-    period: '2024-2',
-    year: '2024',
-    uploadDate: '2024-03-20',
-    downloadUrl: '/download/deportivo/2024-2'
-  },
-  {
-    id: '4',
-    name: 'Evaluaciones_Deportivo_2023-2.xlsx',
-    department: 'Extraacadémico Deportivo',
-    period: '2023-2',
-    year: '2023',
-    uploadDate: '2023-12-15',
-    downloadUrl: '/download/deportivo/2023-2'
-  },
-  {
-    id: '5',
-    name: 'Evaluaciones_Cultural_2024-1.xlsx',
-    department: 'Extraacadémico Cultural',
-    period: '2024-1',
-    year: '2024',
-    uploadDate: '2024-03-13',
-    downloadUrl: '/download/cultural/2024-1'
-  },
-  {
-    id: '6',
-    name: 'Evaluaciones_Laboratoristas_2024-1.xlsx',
-    department: 'Laboratorista',
-    period: '2024-1',
-    year: '2024',
-    uploadDate: '2024-03-12',
-    downloadUrl: '/download/laboratoristas/2024-1'
-  },
-  {
-    id: '7',
-    name: 'Evaluaciones_Tutoreo_2024-1.xlsx',
-    department: 'Tutoreo',
-    period: '2024-1',
-    year: '2024',
-    uploadDate: '2024-03-11',
-    downloadUrl: '/download/tutoreo/2024-1'
-  }
-];
-
 const departments = [
-  'Académico',
-  'Extraacadémico Deportivo',
-  'Extraacadémico Cultural',
-  'Laboratorista',
-  'Tutoreo'
+  { label: 'Académico', value: 'academico' },
+  { label: 'Extraacadémico Deportivo', value: 'deportivo' },
+  { label: 'Extraacadémico Cultural', value: 'cultural' },
+  { label: 'Laboratoristas', value: 'laboratoristas' },
+  { label: 'Tutoreo', value: 'tutoreo' },
 ];
 
 interface HistoricoProps {
@@ -92,32 +23,50 @@ interface HistoricoProps {
 
 const Historico: React.FC<HistoricoProps> = ({ onNavigate }) => {
   const [selectedDepartment, setSelectedDepartment] = useState<string>('');
-  const [files, setFiles] = useState<HistoricalFile[]>(mockHistoricalFiles);
+  const [files, setFiles] = useState<HistoricalFile[]>([]);
 
-  const filteredFiles = files.filter(
-    file => file.department === selectedDepartment
-  );
+  useEffect(() => {
+    if (!selectedDepartment) return;
 
-  // Agrupar archivos por período
-  const filesByPeriod = filteredFiles.reduce((acc, file) => {
-    if (!acc[file.period]) {
-      acc[file.period] = [];
+    fetch(`http://localhost:3000/${selectedDepartment}/historico`)
+      .then(res => res.json())
+      .then(data => setFiles(data))
+      .catch(err => {
+        console.error('Error al obtener histórico:', err);
+        setFiles([]);
+      });
+  }, [selectedDepartment]);
+
+  const handleDelete = async (file: HistoricalFile) => {
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar "${file.name}"?`)) return;
+
+    try {
+      const res = await fetch(`http://localhost:3000/${file.department}/borrar-archivo`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileName: file.name }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert('Archivo eliminado correctamente');
+        setFiles(prev => prev.filter(f => f.name !== file.name));
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error al eliminar archivo:', error);
+      alert('Error de conexión con el servidor');
     }
+  };
+
+  const filesByPeriod = files.reduce((acc, file) => {
+    if (!acc[file.period]) acc[file.period] = [];
     acc[file.period].push(file);
     return acc;
   }, {} as Record<string, HistoricalFile[]>);
-
-  const handleDownload = (file: HistoricalFile) => {
-    // In a real implementation, this would trigger the file download
-    console.log('Downloading file:', file.name);
-    // window.location.href = file.downloadUrl;
-  };
-
-  const handleDelete = (fileId: string) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este archivo?')) {
-      setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
-    }
-  };
 
   return (
     <div className="p-6 h-full bg-gradient-to-br from-blue-50 to-purple-50">
@@ -138,10 +87,10 @@ const Historico: React.FC<HistoricoProps> = ({ onNavigate }) => {
           onChange={(e) => setSelectedDepartment(e.target.value)}
           className="px-4 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
         >
-          <option value="">Selecciona un departamento</option>
+          <option label="">Selecciona un departamento</option>
           {departments.map((dept) => (
-            <option key={dept} value={dept}>
-              {dept}
+            <option key={dept.value} value={dept.value}>
+              {dept.label}
             </option>
           ))}
         </select>
@@ -150,32 +99,33 @@ const Historico: React.FC<HistoricoProps> = ({ onNavigate }) => {
       {selectedDepartment ? (
         <div className="space-y-8">
           {Object.entries(filesByPeriod).length > 0 ? (
-            Object.entries(filesByPeriod).map(([period, files]) => (
+            Object.entries(filesByPeriod).map(([period, group]) => (
               <div key={period} className="space-y-4">
                 <h2 className="text-xl font-semibold text-gray-800">Período {period}</h2>
-                {files.map((file) => (
+                {group.map((file) => (
                   <div
-                    key={file.id}
-                    className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] transition-all duration-200"
+                    key={file.name}
+                    className="bg-white/30 backdrop-blur-lg p-4 rounded-2xl shadow border border-white/20"
                   >
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3 className="font-medium text-gray-900">{file.name}</h3>
-                        <p className="text-sm text-gray-600">
-                          Subido el: {new Date(file.uploadDate).toLocaleDateString('es-ES')}
-                        </p>
+                        <h3 className="font-medium text-gray-900">
+                          {file.year}_{selectedDepartment.charAt(0).toUpperCase() + selectedDepartment.slice(1)}_{file.period}
+                        </h3>
+                        <p className="text-sm text-gray-600">Año: {file.year}</p>
                       </div>
                       <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleDownload(file)}
-                          className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50/50 transition-colors duration-200"
+                        <a
+                          href={`http://localhost:3000${file.downloadUrl}`}
+                          className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50/50 transition"
                           title="Descargar archivo"
+                          download
                         >
                           <HiDownload className="w-5 h-5" />
-                        </button>
+                        </a>
                         <button
-                          onClick={() => handleDelete(file.id)}
-                          className="p-2 text-red-600 hover:text-red-800 rounded-full hover:bg-red-50/50 transition-colors duration-200"
+                          onClick={() => handleDelete(file)}
+                          className="p-2 text-red-600 hover:text-red-800 rounded-full hover:bg-red-50/50 transition"
                           title="Eliminar archivo"
                         >
                           <HiTrash className="w-5 h-5" />
@@ -187,13 +137,13 @@ const Historico: React.FC<HistoricoProps> = ({ onNavigate }) => {
               </div>
             ))
           ) : (
-            <div className="bg-white/30 backdrop-blur-lg p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 text-center">
-              <p className="text-gray-600">No hay archivos históricos disponibles para este departamento</p>
+            <div className="bg-white/30 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/20">
+              <p className="text-gray-600">No hay archivos históricos disponibles para este departamento.</p>
             </div>
           )}
         </div>
       ) : (
-        <div className="bg-white/30 backdrop-blur-lg p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 text-center">
+        <div className="bg-white/30 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/20">
           <p className="text-gray-600">Selecciona un departamento para ver los archivos históricos</p>
         </div>
       )}
@@ -201,4 +151,4 @@ const Historico: React.FC<HistoricoProps> = ({ onNavigate }) => {
   );
 };
 
-export default Historico; 
+export default Historico;

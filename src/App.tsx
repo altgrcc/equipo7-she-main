@@ -64,7 +64,7 @@ function App() {
       mainContent = <Historico onNavigate={setSelectedScreen} />;
       break;
     case 'Subir Excel':
-      mainContent = <SubirExcel />;
+      mainContent = <SubirExcel onNavigate={setSelectedScreen} />;
       break;
     case 'Departamentos':
       mainContent = <DepartamentosDashboard />;

@@ -1,11 +1,7 @@
-import { MoreVertical } from "lucide-react";
+
 import { createContext, useContext, useState, type ReactNode, type FC } from "react";
-import { 
-    HiOutlineHome, HiClipboardList, HiOutlineUserGroup, HiLogout, HiOutlineLogout,
-    HiNewspaper, HiPlusCircle, HiDocumentReport, HiPaperAirplane, 
-    HiViewGrid, HiUserCircle 
-} from "react-icons/hi";
-import { HiUser } from "react-icons/hi2";
+import { HiOutlineLogout,HiUserCircle } from "react-icons/hi";
+
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import onlyStar from '../assets/only-star.png';
 import onlyText from '../assets/only-text.png';
@@ -71,8 +67,8 @@ const Sidebar: FC<SidebarProps> = ({ children, onLogout }) => {
                         `}
                     >
                         <div className="leading-4">
-                            <h4 className="font-semibold text-gray-800">José Luis Mejía</h4>
-                            <span className="text-xs text-gray-600">jl.mejia@tec.mx</span>
+                            <h4 className="font-semibold text-gray-800">Samuel Isaac Lopez Mar</h4>
+                            <span className="text-xs text-gray-600">A01563581@tec.mx</span>
                         </div>
                         <button
                             className="ml-2 p-1 rounded hover:bg-gray-200 relative"

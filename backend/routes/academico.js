@@ -58,7 +58,8 @@ router.post('/upload', upload.single('excelFile'), async (req, res) => {
 
     const originalPath = req.file.path;
     const fileExtension = path.extname(req.file.originalname);
-    const baseName = `${year}_${departamento}_${periodo}`;
+    const departamentoFinal = ['academico', 'Académico'].includes(departamento) ? 'Academico' : departamento;
+    const baseName = `${year}_${departamentoFinal}_${periodo}`;
     const finalPath = path.join(uploadsDir, `${baseName}${fileExtension}`);
 
     console.log('Rutas:', { originalPath, finalPath });
@@ -176,7 +177,8 @@ router.put('/upload', upload.single('excelFile'), async (req, res) => {
   const { year, departamento, periodo } = req.body;
   const originalPath = req.file.path;
   const fileExtension = path.extname(req.file.originalname);
-  const baseName = `${year}_${departamento}_${periodo}`;
+  const departamentoFinal = ['academico', 'Académico'].includes(departamento) ? 'Academico' : departamento;
+  const baseName = `${year}_${departamentoFinal}_${periodo}`;
   const finalPath = path.join(uploadsDir, `${baseName}${fileExtension}`);
 
   try {
@@ -348,5 +350,111 @@ router.post('/borrar-archivo', async (req, res) => {
     res.status(500).send('Error eliminando archivo.');
   }
 });
+
+//historico
+router.get('/historico', async (req, res) => {
+  try {
+    const pool = await sql.connect(connection);
+    const result = await pool.request()
+      .query(`SELECT DISTINCT year, periodo FROM academico ORDER BY year DESC, periodo DESC`);
+
+    const data = result.recordset.map(row => ({
+      name: `${row.year}_Academico_${row.periodo}.xlsx`,
+      department: 'Academico',
+      period: row.periodo,
+      year: row.year,
+      downloadUrl: `/download/academico/${row.year}_Academico_${row.periodo}.xlsx`
+    }));
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error obteniendo histórico académico:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+router.get('/resultados', async (req, res) => {
+  const { year, periodo } = req.query;
+
+  if (!year || !periodo) {
+    return res.status(400).json({ error: 'Parámetros requeridos: year y periodo' });
+  }
+
+  try {
+    const pool = await sql.connect(connection);
+    const result = await pool.request()
+      .input('year', year)
+      .input('periodo', periodo)
+      .query(`
+        SELECT profesor, clase AS materia,
+               r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13
+        FROM academico
+        WHERE year = @year AND periodo = @periodo
+      `);
+
+    const rows = result.recordset;
+
+    const agrupado = {};
+
+    rows.forEach((prof) => {
+      const key = `${prof.profesor}__${prof.materia}`;
+      const respuestas = [
+        prof.r1, prof.r2, prof.r3, prof.r4, prof.r5, prof.r6, prof.r7,
+        prof.r8, prof.r9, prof.r10, prof.r11, prof.r12, prof.r13
+      ].map(Number).filter(n => !isNaN(n));
+
+      if (!agrupado[key]) {
+        agrupado[key] = { profesor: prof.profesor, materia: prof.materia, total: 0, count: 0 };
+      }
+
+      agrupado[key].total += respuestas.reduce((acc, n) => acc + n, 0);
+      agrupado[key].count += respuestas.length;
+    });
+
+    const profesoresAgrupados = Object.values(agrupado).map(p => ({
+      profesor: p.profesor,
+      materia: p.materia,
+      promedio: p.count ? p.total / p.count : null
+    }));
+
+    const profesoresValidos = profesoresAgrupados.filter(p => p.promedio !== null);
+
+    const promedioDepto = profesoresValidos.length > 0
+      ? profesoresValidos.reduce((acc, p) => acc + p.promedio, 0) / profesoresValidos.length
+      : 0;
+
+    res.json({
+      promedioDepartamento: promedioDepto.toFixed(1),
+      profesores: profesoresAgrupados
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener resultados' });
+  }
+});
+
+router.get('/disponibles', async (req, res) => {
+  try {
+    const pool = await sql.connect(connection);
+    const result = await pool.request()
+      .query(`SELECT DISTINCT year, periodo FROM academico ORDER BY year DESC, periodo DESC`);
+
+    const data = {};
+
+    result.recordset.forEach(row => {
+      const y = row.year.toString();
+      if (!data[y]) data[y] = [];
+      if (!data[y].includes(row.periodo.toString())) {
+        data[y].push(row.periodo.toString());
+      }
+    });
+
+    res.json(data);
+  } catch (err) {
+    console.error('Error en /academico/disponibles:', err);
+    res.status(500).json({ error: 'Error al obtener años/periodos' });
+  }
+});
+
 
 module.exports = router;

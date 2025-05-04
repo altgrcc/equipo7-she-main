@@ -1,26 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 
-const initialUsuarios = [
-  { id: 1, nombre: "Juan", segundoNombre: "", apellido: "Pérez", segundoApellido: "", matricula: "A001", correo: "juan@uni.mx", contrasena: "", rol: "Administrador" },
-  { id: 2, nombre: "Ana", segundoNombre: "", apellido: "Gómez", segundoApellido: "", matricula: "A002", correo: "ana@uni.mx", contrasena: "", rol: "Profesor" },
-  { id: 3, nombre: "Luis", segundoNombre: "", apellido: "Martínez", segundoApellido: "", matricula: "A003", correo: "luis@uni.mx", contrasena: "", rol: "Estudiante" },
-];
-
 const emptyUser = {
-  id: null,
-  nombre: "",
-  segundoNombre: "",
-  apellido: "",
-  segundoApellido: "",
-  matricula: "",
-  correo: "",
-  contrasena: "",
-  rol: "profesor",
+  nombre: '',
+  segundoNombre: '',
+  apellido: '',
+  segundoApellido: '',
+  matricula: '',
+  correo: '',
+  contrasena: '',
+  rol: 'Profesor',
 };
 
 const UsuariosDashboard: React.FC = () => {
-  const [usuarios, setUsuarios] = useState(initialUsuarios);
+  const [usuarios, setUsuarios] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
   const [selectedUser, setSelectedUser] = useState<any>(emptyUser);
@@ -29,7 +22,23 @@ const UsuariosDashboard: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState<string>("todos");
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  // Cerrar menú al hacer clic fuera
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:3000/api/usuarios', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        setUsuarios(data);
+      } catch (error) {
+        console.error('Error al obtener usuarios:', error);
+      }
+    };
+
+    fetchUsuarios();
+  }, []);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -46,54 +55,155 @@ const UsuariosDashboard: React.FC = () => {
     };
   }, [showMenuId]);
 
-  // Handlers
   const openAddModal = () => {
-    setSelectedUser(emptyUser);
+    setSelectedUser({...emptyUser});
     setModalType('add');
     setShowModal(true);
   };
+
   const openEditModal = (user: any) => {
     setSelectedUser(user);
     setModalType('edit');
     setShowModal(true);
     setShowMenuId(null);
   };
+
   const openDeleteModal = (user: any) => {
     setSelectedUser(user);
     setShowDeleteModal(true);
     setShowMenuId(null);
   };
+
   const closeModal = () => {
     setShowModal(false);
     setSelectedUser(emptyUser);
     setModalType(null);
   };
+
   const closeDeleteModal = () => {
     setShowDeleteModal(false);
     setSelectedUser(emptyUser);
   };
-  const handleDelete = () => {
-    setUsuarios(usuarios.filter(u => u.id !== selectedUser.id));
-    closeDeleteModal();
-  };
-  // For add/edit (no backend, just local update)
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (modalType === 'add') {
-      setUsuarios([
-        ...usuarios,
-        { ...selectedUser, id: Date.now() },
-      ]);
-    } else if (modalType === 'edit') {
-      setUsuarios(usuarios.map(u => u.id === selectedUser.id ? selectedUser : u));
+    if (!selectedUser.correo.toLowerCase().endsWith('@tec.mx')) {
+      alert('El correo institucional debe terminar en @tec.mx');
+      return;
     }
-    closeModal();
+    if (!selectedUser.rol || selectedUser.rol === '') {
+      alert('Por favor selecciona un rol de usuario.');
+      return;
+    }    
+    const token = localStorage.getItem('token');
+
+    if (modalType === 'add') {
+      try {
+        const response = await fetch('http://localhost:3000/api/usuarios', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            matricula: selectedUser.matricula,
+            nombre: selectedUser.nombre,
+            segundo_nombre: selectedUser.segundoNombre,
+            apellido: selectedUser.apellido,
+            segundo_apellido: selectedUser.segundoApellido,
+            correo: selectedUser.correo,
+            password: selectedUser.contrasena,
+            rol: selectedUser.rol ? selectedUser.rol.charAt(0).toUpperCase() + selectedUser.rol.slice(1) : '',
+          }),
+        });
+
+        const text = await response.text();
+console.log('Respuesta cruda del servidor:', text);
+
+let data;
+try {
+  data = JSON.parse(text);
+} catch (e) {
+  alert('El servidor devolvió una respuesta no válida');
+  return;
+}
+
+        if (response.ok) {
+          alert('Usuario creado correctamente');
+          setUsuarios([...usuarios, selectedUser]);
+          closeModal();
+        } else {
+          alert(data.error || 'Error al crear usuario');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Error de conexión con el servidor');
+      }
+    }
+
+    if (modalType === 'edit') {
+      try {
+        const response = await fetch(`http://localhost:3000/api/usuarios/${selectedUser.matricula}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            nombre: selectedUser.nombre,
+            segundo_nombre: selectedUser.segundoNombre,
+            apellido: selectedUser.apellido,
+            segundo_apellido: selectedUser.segundoApellido,
+            correo: selectedUser.correo,
+            rol: selectedUser.rol ? selectedUser.rol.charAt(0).toUpperCase() + selectedUser.rol.slice(1) : 'Profesor',
+          }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          alert('Usuario actualizado correctamente');
+          setUsuarios(usuarios.map(u => u.matricula === selectedUser.matricula ? selectedUser : u));
+          closeModal();
+        } else {
+          alert(data.error || 'Error al actualizar usuario');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Error de conexión con el servidor');
+      }
+    }
   };
 
-  // Filter users based on selected role
-  const filteredUsuarios = roleFilter === "todos" 
-    ? usuarios 
-    : usuarios.filter(usuario => usuario.rol.toLowerCase() === roleFilter.toLowerCase());
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3000/api/usuarios/${selectedUser.matricula}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert('Usuario eliminado');
+        setUsuarios(usuarios.filter(u => u.matricula !== selectedUser.matricula));
+        closeDeleteModal();
+      } else {
+        alert(data.error || 'Error al eliminar usuario');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error de conexión con el servidor');
+    }
+  };
+  
+
+  const filteredUsuarios = roleFilter.toLowerCase() === "todos"
+  ? usuarios
+  : usuarios.filter(usuario => usuario.rol.toLowerCase() === roleFilter.toLowerCase());
+
 
   return (
     <div className="p-6 h-full bg-gradient-to-br from-blue-50 to-purple-50">
@@ -106,7 +216,7 @@ const UsuariosDashboard: React.FC = () => {
           Agregar usuario
         </button>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-visible">
         <div className="bg-white/30 backdrop-blur-lg rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20">
           <table className="min-w-full">
             <thead>
@@ -116,14 +226,13 @@ const UsuariosDashboard: React.FC = () => {
                   <div className="flex items-center">
                     <span>Rol</span>
                     <select
-                      className="ml-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500/50 transition duration-150"
-                      value={roleFilter}
-                      onChange={(e) => setRoleFilter(e.target.value)}
-                    >
+                      className="ml-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500/50 transition duration-150" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
                       <option value="todos">Todos</option>
-                      <option value="administrador">Administrador</option>
-                      <option value="profesor">Profesor</option>
-                      <option value="estudiante">Estudiante</option>
+                      <option value="Administrador">Administrador</option>
+                      <option value="Directivo">Directivo</option>
+                      <option value="Talento">Talento</option>
+                      <option value="Coordinador">Coordinador</option> 
+                      <option value="Profesor">Profesor</option>
                     </select>
                   </div>
                 </th>
@@ -132,19 +241,19 @@ const UsuariosDashboard: React.FC = () => {
             </thead>
             <tbody>
               {filteredUsuarios.map((usuario) => (
-                <tr key={usuario.id} className="hover:bg-white/20 transition-colors duration-200">
+                <tr key={usuario.matricula} className="hover:bg-white/20 transition-colors duration-200">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                    {usuario.nombre} {usuario.segundoNombre} {usuario.apellido} {usuario.segundoApellido}
+                    {usuario.nombre} {usuario.segundo_nombre ||''} {usuario.apellido} {usuario.segundo_apellido ||''}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{usuario.rol}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium relative">
                     <button
                       className="p-2 rounded hover:bg-white/30 transition-colors duration-200"
-                      onClick={() => setShowMenuId(usuario.id === showMenuId ? null : usuario.id)}
+                      onClick={() => setShowMenuId(usuario.matricula === showMenuId ? null : usuario.matricula)}
                     >
                       <HiOutlineDotsVertical size={20} />
                     </button>
-                    {showMenuId === usuario.id && (
+                    {showMenuId === usuario.matricula && (
                       <div ref={menuRef} className="absolute right-0 mt-2 bg-white/30 backdrop-blur-lg rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 z-50 w-32">
                         <div className="flex flex-col">
                           <button
@@ -181,7 +290,7 @@ const UsuariosDashboard: React.FC = () => {
               &times;
             </button>
             <h3 className="text-lg font-bold mb-4 text-gray-800">{modalType === 'add' ? 'Agregar usuario' : 'Editar usuario'}</h3>
-            <form className="space-y-4" onSubmit={handleFormSubmit}>
+            <form className="space-y-4" onSubmit={handleFormSubmit} autoComplete="off">
               <div className="flex gap-4">
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700">Nombre</label>
@@ -215,15 +324,17 @@ const UsuariosDashboard: React.FC = () => {
               <div className="flex gap-4">
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700">Contraseña</label>
-                  <input type="password" className="mt-1 block w-full bg-white/50 backdrop-blur-sm border border-white/30 rounded px-3 py-2 focus:outline-none focus:border-blue-500/50 transition duration-150" value={selectedUser.contrasena} onChange={e => setSelectedUser({ ...selectedUser, contrasena: e.target.value })} required={modalType === 'add'} />
+                  <input type="password" className="mt-1 block w-full bg-white/50 backdrop-blur-sm border border-white/30 rounded px-3 py-2 focus:outline-none focus:border-blue-500/50 transition duration-150" value={selectedUser.contrasena}autoComplete="new password"onChange={e => setSelectedUser({ ...selectedUser, contrasena: e.target.value })} required={modalType === 'add'} />
                 </div>
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700">Rol de usuario</label>
                   <select className="mt-1 block w-full bg-white/50 backdrop-blur-sm border border-white/30 rounded px-3 py-2 focus:outline-none focus:border-blue-500/50 transition duration-150" value={selectedUser.rol} onChange={e => setSelectedUser({ ...selectedUser, rol: e.target.value })} required>
-                    <option value="profesor">Profesor</option>
-                    <option value="coordinador">Coordinador</option>
-                    <option value="estudiante">Estudiante</option>
-                    <option value="it">IT</option>
+                      <option value=""disabled>Selecciona un rol</option>
+                      <option value="Administrador">Administrador</option>
+                      <option value="Directivo">Directivo</option>
+                      <option value="Talento">Talento</option>
+                      <option value="Coordinador">Coordinador</option> 
+                      <option value="Profesor">Profesor</option>
                   </select>
                 </div>
               </div>

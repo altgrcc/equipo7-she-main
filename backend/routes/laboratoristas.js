@@ -15,18 +15,11 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, '../uploads/laboratoristas'));
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + '-' + file.originalname);
+    cb(null, `${Date.now()}_${file.originalname}`);
   }
 });
 const upload = multer({ storage });
 
-// ------------------------------------------------------
-// GET /upload - Mostrar formulario para subir archivo
-// ------------------------------------------------------
-router.get('/upload', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/uploadFileLaboratoristas.html'));
-});
 
 // ------------------------------------------------------
 // POST /upload - Subir nuevo archivo y guardar datos
@@ -35,7 +28,8 @@ router.post('/upload', upload.single('excelFile'), async (req, res) => {
   const { year, departamento, periodo } = req.body;
   const originalPath = req.file.path;
   const fileExtension = path.extname(req.file.originalname);
-  const baseName = `${year}_${departamento}_${periodo}`;
+  const departamentoFinal = ['Laboratorista', 'laboratorista'].includes(departamento) ? 'Laboratoristas' : departamento;
+  const baseName = `${year}_${departamentoFinal}_${periodo}`;
   const folder = path.join(__dirname, '../uploads/laboratoristas');
   const finalPath = path.join(folder, `${baseName}${fileExtension}`);
 
@@ -113,12 +107,6 @@ router.post('/upload', upload.single('excelFile'), async (req, res) => {
   }
 });
 
-// ------------------------------------------------------
-// GET /update - Mostrar formulario para actualizar archivo
-// ------------------------------------------------------
-router.get('/update', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/updateFileLaboratoristas.html'));
-});
 
 // ------------------------------------------------------
 // PUT /upload - Actualizar archivo existente y reemplazar datos
@@ -127,7 +115,8 @@ router.put('/upload', upload.single('excelFile'), async (req, res) => {
   const { year, departamento, periodo } = req.body;
   const originalPath = req.file.path;
   const fileExtension = path.extname(req.file.originalname);
-  const baseName = `${year}_${departamento}_${periodo}`;
+  const departamentoFinal = ['Laboratorista', 'laboratorista'].includes(departamento) ? 'Laboratoristas' : departamento;
+  const baseName = `${year}_${departamentoFinal}_${periodo}`;
   const folder = path.join(__dirname, '../uploads/laboratoristas');
   const finalPath = path.join(folder, `${baseName}${fileExtension}`);
 
@@ -213,13 +202,6 @@ router.put('/upload', upload.single('excelFile'), async (req, res) => {
 });
 
 // ------------------------------------------------------
-// GET /delete - Mostrar formulario para eliminar archivo
-// ------------------------------------------------------
-router.get('/delete', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/deleteFileLaboratoristas.html'));
-  });
-  
-// ------------------------------------------------------
 // GET /api/listar-archivos - Listar archivos .xlsx existentes
 // ------------------------------------------------------
 router.get('/api/listar-archivos', (req, res) => {
@@ -268,6 +250,27 @@ router.post('/borrar-archivo', async (req, res) => {
   } catch (error) {
     console.error('Error al borrar archivo laboratoristas:', error);
     res.status(500).send('Error eliminando archivo de laboratoristas.');
+  }
+});
+
+router.get('/historico', async (req, res) => {
+  try {
+    const pool = await sql.connect(connection);
+    const result = await pool.request()
+      .query(`SELECT DISTINCT year, periodo FROM laboratoristas ORDER BY year DESC, periodo DESC`);
+
+    const data = result.recordset.map(row => ({
+      name: `${row.year}_Laboratoristas_${row.periodo}.xlsx`,
+      department: 'Laboratoristas',
+      period: row.periodo,
+      year: row.year,
+      downloadUrl: `/download/laboratoristas/${row.year}_Laboratoristas_${row.periodo}.xlsx`
+    }));
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error obteniendo histórico laboratoristas:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
   

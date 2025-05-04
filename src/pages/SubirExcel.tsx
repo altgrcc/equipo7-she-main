@@ -8,7 +8,11 @@ interface ExistingFile {
   department: string;
 }
 
-const SubirExcel: React.FC = () => {
+interface SubirExcelProps {
+  onNavigate: (screen: string) => void;
+}
+
+const SubirExcel: React.FC<SubirExcelProps> = ({ onNavigate }) => {
   const [file, setFile] = useState<File | null>(null);
   const [year, setYear] = useState<string>('');
   const [department, setDepartment] = useState<string>('');
@@ -22,13 +26,6 @@ const SubirExcel: React.FC = () => {
     }
   };
 
-  const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === '' || (Number(value) >= 2020 && Number(value) <= 3000)) {
-      setYear(value);
-    }
-  };
-
   const handleUpload = async () => {
     if (file && year && department && period) {
       const formData = new FormData();
@@ -37,7 +34,6 @@ const SubirExcel: React.FC = () => {
       formData.append('periodo', period);
       formData.append('excelFile', file);
 
-      // Determinar endpoint según departamento
       let endpoint = '';
       switch (department) {
         case 'Académico':
@@ -49,7 +45,7 @@ const SubirExcel: React.FC = () => {
         case 'Extraacadémico Cultural':
           endpoint = '/cultural/upload';
           break;
-        case 'Laboratorista':
+        case 'Laboratoristas':
           endpoint = '/laboratoristas/upload';
           break;
         case 'Tutoreo':
@@ -84,7 +80,6 @@ const SubirExcel: React.FC = () => {
 
         if (response.ok) {
           alert(result.mensaje || 'Archivo subido correctamente');
-          // Limpiar el formulario después de una subida exitosa
           setFile(null);
           setYear('');
           setDepartment('');
@@ -129,7 +124,7 @@ const SubirExcel: React.FC = () => {
 
   const handleDownload = async (filename: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/files/download/${filename}`);
+      const response = await fetch(`http://localhost:3000/download/${filename}`);
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -159,17 +154,18 @@ const SubirExcel: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Año
               </label>
-              <input
-                type="number"
+              <select
                 value={year}
-                onChange={handleYearChange}
-                min="2020"
-                max="3000"
-                step="1"
+                onChange={(e) => setYear(e.target.value)}
                 className="w-full px-3 py-2 bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg focus:outline-none focus:border-blue-500/50 transition duration-150"
-                placeholder="Ej: 2024"
-                onKeyPress={(e) => e.preventDefault()}
-              />
+              >
+                <option value="">Seleccione un año</option>
+                {Array.from({ length: 3000 - 2015 + 1 }, (_, i) => 2015 + i).map((yr) => (
+                  <option key={yr} value={yr}>
+                    {yr}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -185,7 +181,7 @@ const SubirExcel: React.FC = () => {
                 <option value="Académico">Académico</option>
                 <option value="Extraacadémico Deportivo">Extraacadémico Deportivo</option>
                 <option value="Extraacadémico Cultural">Extraacadémico Cultural</option>
-                <option value="Laboratorista">Laboratorista</option>
+                <option value="Laboratoristas">Laboratoristas</option>
                 <option value="Tutoreo">Tutoreo</option>
               </select>
             </div>
@@ -263,10 +259,18 @@ const SubirExcel: React.FC = () => {
           >
             Subir Archivo
           </button>
+
+          {/* Botón de cerrar */}
+          <button
+            onClick={() => onNavigate('Histórico')}
+            className="w-full py-2 px-4 rounded-lg font-medium text-red-600 border border-red-200 bg-white/30 backdrop-blur-sm hover:bg-red-500 hover:text-white transition-all duration-200"
+          >
+            Cerrar formulario
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default SubirExcel; 
+export default SubirExcel;

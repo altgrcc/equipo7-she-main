@@ -11,8 +11,8 @@ const NuevaEncuesta: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Dummy submit function
-    alert('Encuesta enviada exitosamente!');
+
+    alert('Próximamente estará disponible');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -144,7 +144,7 @@ const NuevaEncuesta: React.FC = () => {
             <div className="flex justify-center mt-8">
               <button
                 type="submit"
-                className="bg-blue-500/80 hover:bg-blue-600/80 backdrop-blur-sm text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out border border-blue-500/20"
+                className="bg-blue-500/80 hover:bg-blue-600/80 backdrop-blur-sm text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out border border-blue-500/20"        
               >
                 Subir Encuesta
               </button>

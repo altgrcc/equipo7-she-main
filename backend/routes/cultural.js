@@ -14,8 +14,7 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, '../uploads/cultural'));
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + '-' + file.originalname);
+    cb(null, `${Date.now()}_${file.originalname}`);  
   }
 });
 const upload = multer({ storage });
@@ -34,7 +33,8 @@ router.post('/upload', upload.single('excelFile'), async (req, res) => {
   const { year, departamento, periodo } = req.body;
   const originalPath = req.file.path;
   const fileExtension = path.extname(req.file.originalname);
-  const baseName = `${year}_${departamento}_${periodo}`;
+  const departamentoFinal = ['Extraacademico Cultural', 'Extraacadémico Cultural'].includes(departamento) ? 'Cultural' : departamento;
+  const baseName = `${year}_${departamentoFinal}_${periodo}`;
   const folder = path.join(__dirname, '../uploads/cultural');
   const finalPath = path.join(folder, `${baseName}${fileExtension}`);
 
@@ -124,7 +124,8 @@ router.put('/upload', upload.single('excelFile'), async (req, res) => {
   const { year, departamento, periodo } = req.body;
   const originalPath = req.file.path;
   const fileExtension = path.extname(req.file.originalname);
-  const baseName = `${year}_${departamento}_${periodo}`;
+  const departamentoFinal = ['Extraacademico Cultural', 'Extraacadémico Cultural'].includes(departamento) ? 'Cultural' : departamento;
+  const baseName = `${year}_${departamentoFinal}_${periodo}`;
   const folder = path.join(__dirname, '../uploads/cultural');
   const finalPath = path.join(folder, `${baseName}${fileExtension}`);
 
@@ -265,7 +266,7 @@ router.post('/borrar-archivo', async (req, res) => {
       return res.status(404).send('Archivo no encontrado.');
     }
 
-    const [year, departamento, periodoWithExtension] = fileName.split('_');
+    const [year, departamentoFinal, periodoWithExtension] = fileName.split('_');
     const periodo = periodoWithExtension.split('.')[0];
 
     const pool = await sql.connect(connection);
@@ -283,6 +284,108 @@ router.post('/borrar-archivo', async (req, res) => {
   } catch (error) {
     console.error('Error al borrar archivo cultural:', error);
     res.status(500).send('Error eliminando archivo cultural.');
+  }
+});
+
+router.get('/historico', async (req, res) => {
+  try {
+    const pool = await sql.connect(connection);
+    const result = await pool.request()
+      .query(`SELECT DISTINCT year, periodo FROM cultural ORDER BY year DESC, periodo DESC`);
+
+    const data = result.recordset.map(row => ({
+      name: `${row.year}_Cultural_${row.periodo}.xlsx`,
+      department: 'Cultural',
+      period: row.periodo,
+      year: row.year,
+      downloadUrl: `/download/cultural/${row.year}_Cultural_${row.periodo}.xlsx`
+    }));
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error obteniendo histórico cultural:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+router.get('/resultados', async (req, res) => {
+  const { year, periodo } = req.query;
+
+  if (!year || !periodo) {
+    return res.status(400).json({ error: 'Parámetros requeridos: year y periodo' });
+  }
+
+  try {
+    const pool = await sql.connect(connection);
+    const result = await pool.request()
+      .input('year', year)
+      .input('periodo', periodo)
+      .query(`
+        SELECT profesor, materia, r1, r2, r3, r4, r5, r6, r7, r8, r9
+        FROM cultural
+        WHERE year = @year AND periodo = @periodo
+      `);
+
+    const rows = result.recordset;
+
+    const agrupado = {};
+
+    rows.forEach((prof) => {
+      const key = `${prof.profesor}__${prof.materia}`;
+      const respuestas = [
+        prof.r1, prof.r2, prof.r3, prof.r4, prof.r5,
+        prof.r6, prof.r7, prof.r8, prof.r9
+      ].map(Number).filter(n => !isNaN(n));
+
+      if (!agrupado[key]) {
+        agrupado[key] = { profesor: prof.profesor, materia: prof.materia, total: 0, count: 0 };
+      }
+
+      agrupado[key].total += respuestas.reduce((acc, n) => acc + n, 0);
+      agrupado[key].count += respuestas.length;
+    });
+
+    const profesoresAgrupados = Object.values(agrupado).map(p => ({
+      profesor: p.profesor,
+      materia: p.materia,
+      promedio: p.count ? p.total / p.count : null
+    }));
+
+    const profesoresValidos = profesoresAgrupados.filter(p => p.promedio !== null);
+
+    const promedioDepto = profesoresValidos.length > 0
+      ? profesoresValidos.reduce((acc, p) => acc + p.promedio, 0) / profesoresValidos.length
+      : 0;
+
+    res.json({
+      promedioDepartamento: promedioDepto.toFixed(1),
+      profesores: profesoresAgrupados
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener resultados' });
+  }
+});
+
+router.get('/disponibles', async (req, res) => {
+  try {
+    const pool = await sql.connect(connection);
+    const result = await pool.request()
+      .query(`SELECT DISTINCT year, periodo FROM cultural ORDER BY year DESC, periodo DESC`);
+
+    const data = {};
+
+    result.recordset.forEach(row => {
+      const y = row.year.toString();
+      if (!data[y]) data[y] = [];
+      if (!data[y].includes(row.periodo.toString())) {
+        data[y].push(row.periodo.toString());
+      }
+    });
+
+    res.json(data);
+  } catch (err) {
+    console.error('Error en /cultural/disponibles:', err);
+    res.status(500).json({ error: 'Error al obtener años/periodos' });
   }
 });
 

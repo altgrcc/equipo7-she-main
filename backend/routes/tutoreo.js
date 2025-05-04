@@ -13,8 +13,7 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, '../uploads/tutoreo'));
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + '-' + file.originalname);
+    cb(null, `${Date.now()}_${file.originalname}`);
   }
 });
 const upload = multer({ storage });
@@ -294,6 +293,27 @@ router.post('/borrar-archivo', async (req, res) => {
   } catch (error) {
     console.error('Error al borrar:', error);
     res.status(500).send('Error eliminando.');
+  }
+});
+
+router.get('/historico', async (req, res) => {
+  try {
+    const pool = await sql.connect(connection);
+    const result = await pool.request()
+      .query(`SELECT DISTINCT year, periodo FROM tutoreo ORDER BY year DESC, periodo DESC`);
+
+    const data = result.recordset.map(row => ({
+      name: `${row.year}_Tutoreo_${row.periodo}.xlsx`,
+      department: 'Tutoreo',
+      period: row.periodo,
+      year: row.year,
+      downloadUrl: `/download/tutoreo/${row.year}_Tutoreo_${row.periodo}.xlsx`
+    }));
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error obteniendo histórico tutoreo:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 

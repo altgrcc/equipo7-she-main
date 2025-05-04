@@ -5,7 +5,7 @@ import ExpectedEvaluationsWidget from '../components/ExpectedEvaluationsWidget';
 
 const HomePage: FC = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const userName = "José Luis Mejía";
+    const userName = "Samuel Isaac Lopez Mar";
 
     const departments = [
         {
